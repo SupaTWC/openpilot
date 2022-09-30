@@ -78,3 +78,10 @@ def create_wheel_buttons_command(packer, bus, frame, buttons):
       values[b] = 1
 
   return packer.make_can_msg("CRUISE_BUTTONS", bus, values)
+
+def create_esp8_command(packer, eps_8, kph):
+  values = {
+    "COUNTER": (eps_8["COUNTER"] + 1) % 0x10,
+    "Vehicle_Speed": kph,
+  }
+  return packer.make_can_msg("ESP_8", 0, values)

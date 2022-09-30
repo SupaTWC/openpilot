@@ -1,7 +1,7 @@
 from opendbc.can.packer import CANPacker
 from common.realtime import DT_CTRL
 from selfdrive.car import apply_toyota_steer_torque_limits
-from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, create_lkas_heartbit, create_wheel_buttons_command
+from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, create_lkas_heartbit, create_wheel_buttons_command, create_esp8_command
 from selfdrive.car.chrysler.values import RAM_CARS, PRE_2019, CarControllerParams
 
 from selfdrive.controls.lib.drive_helpers import V_CRUISE_MIN, V_CRUISE_MIN_IMPERIAL
@@ -26,7 +26,7 @@ class CarController:
     self.frame = 0
 
     self.hud_count = 0
-    self.next_lkas_control_change = 0
+    self.next_lkas_control_change = -1
     self.lkas_control_bit_prev = False
     self.last_button_frame = 0
 
@@ -45,6 +45,11 @@ class CarController:
 
   def update(self, CC, CS):
     can_sends = []
+
+    if not self.lkas_control_bit_prev and CS.esp_8["COUNTER"] != 0:
+      self.lkas_control_bit_prev = True
+      new_msg = create_esp8_command(self.packer, CS.esp_8, 15)
+      can_sends.append(new_msg)
 
     lkas_active = CC.latActive and self.lkas_control_bit_prev
 

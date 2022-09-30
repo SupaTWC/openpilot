@@ -37,6 +37,7 @@ class CarState(CarStateBase):
       self.shifter_values = can_define.dv["GEAR"]["PRNDL"]
 
     self.lkasHeartbit = None
+    self.esp_8 = None
 
   def update(self, cp, cp_cam):
     ret = car.CarState.new_message()
@@ -108,6 +109,7 @@ class CarState(CarStateBase):
 
     self.lkas_car_model = cp_cam.vl["DAS_6"]["CAR_MODEL"]
     self.button_counter = cp.vl["CRUISE_BUTTONS"]["COUNTER"]
+    self.esp_8 = cp.vl["ESP_8"]
 
     brake = cp.vl["ESP_8"]["BRK_PRESSURE"]
     gas = cp.vl["ACCEL_RELATED_120"]["ACCEL"]
@@ -207,6 +209,7 @@ class CarState(CarStateBase):
       ("Vehicle_Speed", "ESP_8"),
       ("ACCEL", "ACCEL_RELATED_120"),
       ("BRK_PRESSURE", "ESP_8"),
+      ("COUNTER", "ESP_8"),
     ]
 
     checks = [
