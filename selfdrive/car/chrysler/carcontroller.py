@@ -93,6 +93,11 @@ class CarController:
       self.next_lkas_control_change = self.frame + 200
     self.lkas_control_bit_prev = lkas_control_bit
 
+    # tester present - w/ no response (keeps relevant ECU disabled)
+    if self.frame % 100 == 0:
+      addr, bus = 0x753, 0
+      can_sends.append([addr, 0, b"\x02\x3E\x80\x00\x00\x00\x00\x00", bus])
+
     # steer torque
     new_steer = int(round(CC.actuators.steer * self.params.STEER_MAX))
     apply_steer = apply_toyota_steer_torque_limits(new_steer, self.apply_steer_last, CS.out.steeringTorqueEps, self.params)
