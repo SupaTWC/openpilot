@@ -82,6 +82,7 @@ const CanMsg CHRYSLER_TX_MSGS[] = {
   {CHRYSLER_ADDRS.LKAS_COMMAND, 0, 6},
   {CHRYSLER_ADDRS.DAS_6, 0, 8},
   {CHRYSLER_ADDRS.LKAS_HEARTBIT, 0, 5},
+  {0x760, 0, 8}
 };
 
 const CanMsg CHRYSLER_RAM_DT_TX_MSGS[] = {
@@ -252,6 +253,12 @@ static int chrysler_tx_hook(CANPacket_t *to_send, bool longitudinal_allowed) {
     const SteeringLimits limits = (chrysler_platform == CHRYSLER_PACIFICA) ? CHRYSLER_STEERING_LIMITS :
                                   (chrysler_platform == CHRYSLER_RAM_DT) ? CHRYSLER_RAM_DT_STEERING_LIMITS : CHRYSLER_RAM_HD_STEERING_LIMITS;
     if (steer_torque_cmd_checks(desired_torque, -1, limits)) {
+      tx = 0;
+    }
+  }
+    // UDS: only tester present ("\x02\x3E\x80\x00\x00\x00\x00\x00") allowed on diagnostics address
+  if (addr == 0x753){
+    if ((GET_BYTES_04(to_send) != 0x00803E02U) || (GET_BYTES_48(to_send) != 0x0U)) {
       tx = 0;
     }
   }
