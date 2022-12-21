@@ -16,9 +16,9 @@ def disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x01'
   This is used to disable the radar in some cars. Openpilot will emulate the radar.
   WARNING: THIS DISABLES AEB!"""
   cloudlog.warning(f"ecu disable {hex(addr)} ...")
-  sendcan = messaging.pub_sock('sendcan')
-  logcan = messaging.sub_sock('can')
-  time.sleep(1)
+  # sendcan = messaging.pub_sock('sendcan')
+  # logcan = messaging.sub_sock('can')
+  # time.sleep(1)
   for i in range(retry):
     try:
       query = IsoTpParallelQuery(sendcan, logcan, bus, [addr], [EXT_DIAG_REQUEST], [EXT_DIAG_RESPONSE], -0x280, debug=debug)
