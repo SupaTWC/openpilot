@@ -100,6 +100,22 @@ class CarInterface(CarInterfaceBase):
     return ret
   @staticmethod
   def init(logcan, sendcan):
+    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x00')
+    time.sleep(2)
+    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x01')
+    time.sleep(2)
+    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x02')
+    time.sleep(2)
+    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x03')
+    time.sleep(2)
+    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x04')
+    time.sleep(2)
+    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x05')
+    time.sleep(2)
+    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x06')
+    time.sleep(2)
+    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x07')
+    time.sleep(2)
     disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x08')
     time.sleep(2)
     disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x09')
