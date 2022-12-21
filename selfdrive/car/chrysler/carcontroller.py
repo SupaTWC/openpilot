@@ -94,7 +94,7 @@ class CarController:
     self.lkas_control_bit_prev = lkas_control_bit
 
     # tester present - w/ no response (keeps relevant ECU disabled)
-    if self.frame % 10 == 0:
+    if self.frame % 100 == 0:
       addr, bus = 0x753, 0
       can_sends.append([addr, 0, b"\x02\x3E\x80\x00\x00\x00\x00\x00", bus])
 

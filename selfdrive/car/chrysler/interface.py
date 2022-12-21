@@ -99,16 +99,8 @@ class CarInterface(CarInterfaceBase):
     return ret
   @staticmethod
   def init(CP, logcan, sendcan):
-    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x00')
     disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x01')
-    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x02')    
-    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x03')
-    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x04')   
-    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x05') 
-    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x06')
-    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x07')
-    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x02\x10\x85')
-    
+
   def _update(self, c):
     ret = self.CS.update(self.cp, self.cp_cam)
 
