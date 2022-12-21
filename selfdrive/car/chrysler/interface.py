@@ -6,6 +6,7 @@ from selfdrive.car.chrysler.values import CAR, DBC, RAM_HD, RAM_DT
 from selfdrive.car.interfaces import CarInterfaceBase
 from common.params import Params
 from selfdrive.car.disable_ecu import disable_ecu
+import time
 
 ButtonType = car.CarState.ButtonEvent.Type
 GAS_RESUME_SPEED = 1.
@@ -99,7 +100,7 @@ class CarInterface(CarInterfaceBase):
     return ret
   @staticmethod
   def init(CP, logcan, sendcan):
-    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x01')
+    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x83\x09')
 
   def _update(self, c):
     ret = self.CS.update(self.cp, self.cp_cam)
