@@ -98,9 +98,9 @@ class CarInterface(CarInterfaceBase):
     ret.enableBsm |= 720 in fingerprint[0]
 
     return ret
-  # @staticmethod
-  # def init(CP, logcan, sendcan):
-  #   disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x02\x01')
+  @staticmethod
+  def init(CP, logcan, sendcan):
+    disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x02\x01')
 
   def _update(self, c):
     ret = self.CS.update(self.cp, self.cp_cam)
