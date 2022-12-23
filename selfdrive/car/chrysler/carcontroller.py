@@ -145,6 +145,13 @@ class CarController:
       new_actuators.accel = accel
 
     return new_actuators, can_sends
+    
+    # tester present - w/ no response (keeps relevant ECU disabled)
+    if self.frame % 100 == 0 and self.CP.openpilotLongitudinalControl:
+      addr, bus = 0x7d0, 0
+      if self.CP.flags & HyundaiFlags.CANFD_HDA2.value:
+        addr, bus = 0x730, 5
+      can_sends.append([addr, 0, b"\x02\x3E\x80\x00\x00\x00\x00\x00", bus])
 
   def wheel_button_control(self, CC, CS, can_sends, enabled, das_bus, cancel, resume):
     button_counter = CS.button_counter
