@@ -130,7 +130,7 @@ class CarInterface(CarInterfaceBase):
       # disable_ecu(logcan, sendcan, bus=0, addr=0x1f4, com_cont_req=b'\x85\x02') 
       # time.sleep(1)
       #radar knockout
-      disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x81\x01') 
+      disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x81\x01', rx_offset=-0x280)
     #keep sending tester  
     # while CP.openpilotLongitudinalControl:
     #   sendcan = messaging.pub_sock('sendcan')
