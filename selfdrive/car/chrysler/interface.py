@@ -8,7 +8,10 @@ from selfdrive.car.interfaces import CarInterfaceBase
 from common.cached_params import CachedParams
 from common.params import Params
 from selfdrive.car.disable_ecu import disable_ecu
+from selfdrive.car.isotp_parallel_query import IsoTpParallelQuery
 import time
+import cereal.messaging as messaging
+
 
 ButtonType = car.CarState.ButtonEvent.Type
 GAS_RESUME_SPEED = 1.
@@ -124,6 +127,11 @@ class CarInterface(CarInterfaceBase):
   def init(CP, logcan, sendcan):
     if CP.openpilotLongitudinalControl:
       disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x81\x01') 
+    while CP.openpilotLongitudinalControl:
+      sendcan = messaging.pub_sock('sendcan')
+      logcan = messaging.sub_sock('can')
+      IsoTpParallelQuery(sendcan, logcan, 0, [0x753], [b'\x02\x3E\x80'], [b''], -0x280,)
+      time.sleep(2)
 
   def _update(self, c):
     ret = self.CS.update(self.cp, self.cp_cam)
