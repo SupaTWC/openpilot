@@ -78,3 +78,30 @@ def create_wheel_buttons_command(packer, bus, frame, buttons):
       values[b] = 1
 
   return packer.make_can_msg("CRUISE_BUTTONS", bus, values)
+
+def create_acc_1_message(packer, bus, frame):
+  values = {
+    "ACCEL_PERHAPS": 32767,
+    "COUNTER": frame % 0x10,
+  }
+
+  return packer.make_can_msg("ACC_1", bus)
+
+def create_das_3_message(packer, bus, frame):
+  values = {
+    "ENGINE_TORQUE_REQUEST": 0,
+    "ACC_DECEL": 32767,
+    "GR_MAX_REQ": 9;
+    "COUNTER": frame % 0x10,
+  }
+
+  return packer.make_can_msg("DAS_3", bus)
+
+def create_das_4_message(packer, bus, frame):
+  values = {
+    "ACC_DISTANCE_CONFIG_1": 0x1,
+    "ACC_DISTANCE_CONFIG_2": 0x1,
+    "SPEED_DIGITAL": 0xFE,
+  }
+
+  return packer.make_can_msg("DAS_4", bus, values)

@@ -2,7 +2,7 @@ import math
 from opendbc.can.packer import CANPacker
 from common.realtime import DT_CTRL
 from selfdrive.car import apply_toyota_steer_torque_limits
-from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, create_lkas_heartbit, create_wheel_buttons_command
+from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, create_lkas_heartbit, create_wheel_buttons_command, create_acc_1_message, create_das_3_message, create_das_4_message
 from selfdrive.car.chrysler.values import RAM_CARS, PRE_2019, CarControllerParams
 
 from selfdrive.controls.lib.drive_helpers import V_CRUISE_MIN, V_CRUISE_MIN_IMPERIAL
@@ -101,6 +101,20 @@ class CarController:
     self.apply_steer_last = apply_steer
 
     can_sends.append(create_lkas_command(self.packer, self.CP, int(apply_steer), lkas_control_bit))
+
+    can_sends.append(create_das_3_message(self.packer, 0, self.frame))
+    can_sends.append(create_acc_1_message(self.packer, 0, self.frame))
+    can_sends.append(create_das_3_message(self.packer, 1, self.frame))
+    can_sends.append(create_acc_1_message(self.packer, 1, self.frame))
+
+    if self.frame % 3 == 0:
+      can_sends.append(create_das_4_message(self.packer, 0))
+      can_sends.append(create_das_4_message(self.packer, 1))
+
+    # tester present - w/ no response (keeps radar disabled)
+    if self.CP.openpilotLongitudinalControl:
+      if self.frame % 25== 0:
+        can_sends.append((0x753, 0, b"\x02\x3E\x80\x00\x00\x00\x00\x00", 0))
 
     self.frame += 1
 
