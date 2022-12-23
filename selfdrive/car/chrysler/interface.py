@@ -124,10 +124,6 @@ class CarInterface(CarInterfaceBase):
   def init(CP, logcan, sendcan):
     if CP.openpilotLongitudinalControl:
       disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x81\x01') 
-      time.sleep(10)
-      disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x00\x01')
-
-
 
   def _update(self, c):
     ret = self.CS.update(self.cp, self.cp_cam)
