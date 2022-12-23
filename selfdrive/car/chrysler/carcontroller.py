@@ -144,12 +144,11 @@ class CarController:
     if accel is not None:
       new_actuators.accel = accel
 
-    return new_actuators, can_sends
-
     # tester present - w/ no response (keeps relevant ECU disabled)
     if self.frame % 100 == 0 and self.CP.openpilotLongitudinalControl:
       can_sends.append([0x753, 0, b"\x02\x3E\x80\x00\x00\x00\x00\x00", 0])
-
+    return new_actuators, can_sends
+    
   def wheel_button_control(self, CC, CS, can_sends, enabled, das_bus, cancel, resume):
     button_counter = CS.button_counter
     if button_counter == self.last_button_frame:

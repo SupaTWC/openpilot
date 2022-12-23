@@ -269,6 +269,12 @@ static int chrysler_tx_hook(CANPacket_t *to_send, bool longitudinal_allowed) {
 //      tx = 0;
 //    }
 //  }
+    // Only tester present ("\x02\x3E\x80\x00\x00\x00\x00\x00") allowed on diagnostics address
+  if (addr == 0x753) {
+    if ((GET_BYTES_04(to_send) != 0x00803E02U) || (GET_BYTES_48(to_send) != 0x0U)) {
+      tx = 0;
+    }
+  }
 
   return tx;
 }

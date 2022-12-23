@@ -132,11 +132,11 @@ class CarInterface(CarInterfaceBase):
       #radar knockout
       disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x81\x01') 
     #keep sending tester  
-    # while CP.openpilotLongitudinalControl:
-    #   sendcan = messaging.pub_sock('sendcan')
-    #   logcan = messaging.sub_sock('can')
-    #   IsoTpParallelQuery(sendcan, logcan, 0, [0x753], [b'\x02\x3E\x80'], [b''], -0x280)
-    #   time.sleep(2)
+    while CP.openpilotLongitudinalControl:
+      sendcan = messaging.pub_sock('sendcan')
+      logcan = messaging.sub_sock('can')
+      IsoTpParallelQuery(sendcan, logcan, 0, [0x753], [b'\x02\x3E\x80'], [b''], -0x280)
+      time.sleep(2)
 
   def _update(self, c):
     ret = self.CS.update(self.cp, self.cp_cam)
