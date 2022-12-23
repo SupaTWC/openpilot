@@ -126,6 +126,9 @@ class CarInterface(CarInterfaceBase):
   @staticmethod
   def init(CP, logcan, sendcan):
     if CP.openpilotLongitudinalControl:
+      #send server off to 1F4, see if it prevents acc fault
+      disable_ecu(logcan, sendcan, bus=0, addr=0x1f4, com_cont_req=b'\x85\x02') 
+      time.sleep(1)
       disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x81\x01') 
     while CP.openpilotLongitudinalControl:
       sendcan = messaging.pub_sock('sendcan')
