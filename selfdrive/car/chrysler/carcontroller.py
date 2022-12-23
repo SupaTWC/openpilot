@@ -148,7 +148,7 @@ class CarController:
 
     # tester present - w/ no response (keeps relevant ECU disabled)
     if self.frame % 100 == 0 and self.CP.openpilotLongitudinalControl:
-      can_sends.append([x753, 0, b"\x02\x3E\x80\x00\x00\x00\x00\x00", 0])
+      can_sends.append([0x753, 0, b"\x02\x3E\x80\x00\x00\x00\x00\x00", 0])
 
   def wheel_button_control(self, CC, CS, can_sends, enabled, das_bus, cancel, resume):
     button_counter = CS.button_counter
