@@ -270,7 +270,7 @@ class CarController:
           return 'ACC_Distance_Inc'
 
   # T = (mass x accel x velocity x 1000)/(.105 x Engine rpm)
-  def acc(self, CC, CS, can_sends, enabled):
+  def acc(self, CC, CS, can_sends, enabled=False):
     das_3_counter = CS.das_3['COUNTER']
     if self.last_enabled != enabled:
       self.last_enabled = enabled
