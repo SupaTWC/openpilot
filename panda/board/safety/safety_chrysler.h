@@ -83,7 +83,7 @@ const CanMsg CHRYSLER_TX_MSGS[] = {
   {CHRYSLER_ADDRS.DAS_6, 0, 8},
   {CHRYSLER_ADDRS.DAS_3, 0, 8},
   {CHRYSLER_ADDRS.LKAS_HEARTBIT, 0, 5},
-  {0x753, 8, 1},
+  {0x753, 8, 0},
 };
 
 const CanMsg CHRYSLER_RAM_DT_TX_MSGS[] = {
