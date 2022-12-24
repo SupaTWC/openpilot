@@ -271,7 +271,7 @@ class CarController:
 
   # T = (mass x accel x velocity x 1000)/(.105 x Engine rpm)
   def acc(self, CC, CS, can_sends, enabled=False):
-    das_3_counter = CS.das_3['COUNTER']
+    das_3_counter = CS.das_3['COUNTER'] if CS.das_3['COUNTER'] else self.last_das_3_counter
     if self.last_enabled != enabled:
       self.last_enabled = enabled
       can_sends.append(acc_command(self.packer, das_3_counter, enabled, None, None, None, None, None, CS.das_3))
