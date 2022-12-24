@@ -30,6 +30,7 @@ const SteeringLimits CHRYSLER_RAM_HD_STEERING_LIMITS = {
 
 typedef struct {
   const int ACC_1;
+  const int CHIME;
   const int EPS_2;
   const int ESP_1;
   const int ESP_8;
@@ -55,6 +56,7 @@ const ChryslerAddrs CHRYSLER_ADDRS = {
   .CRUISE_BUTTONS   = 571,  // Cruise control buttons
   .DAS_4            = 501,  // ACC engagement states from DASM
   .ACC_1            = 625,  // ACC set speed
+  .CHIME            = 838, // Chime control
 };
 
 // CAN messages for the 5th gen RAM DT platform
@@ -93,6 +95,8 @@ const CanMsg CHRYSLER_TX_MSGS[] = {
   {CHRYSLER_ADDRS.DAS_3, 2, 8},
   {CHRYSLER_ADDRS.DAS_4, 2, 8},
   {CHRYSLER_ADDRS.ACC_1, 2, 8},
+  {CHRYSLER_ADDRS.CHIME, 0, 2},
+  {CHRYSLER_ADDRS.CHIME, 2, 2},
 };
 
 const CanMsg CHRYSLER_RAM_DT_TX_MSGS[] = {
