@@ -29,11 +29,13 @@ const SteeringLimits CHRYSLER_RAM_HD_STEERING_LIMITS = {
 };
 
 typedef struct {
+  const int ACC_1;
   const int EPS_2;
   const int ESP_1;
   const int ESP_8;
   const int ECM_5;
   const int DAS_3;
+  const int DAS_4;
   const int DAS_6;
   const int LKAS_COMMAND;
   const int LKAS_HEARTBIT;
