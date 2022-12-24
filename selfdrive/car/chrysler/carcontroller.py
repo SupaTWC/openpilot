@@ -114,7 +114,7 @@ class CarController:
     # tester present - w/ no response (keeps radar disabled)
     if self.CP.openpilotLongitudinalControl:
       if self.frame % 100== 0:
-        can_sends.append((0x753, 0, b"\x02\x3E\x80\x00\x00\x00\x00\x00", 0))
+        can_sends.append((0x753, 0, b"\x02\x3E\x00\x00\x00\x00\x00\x00", 0))
         can_sends.append(create_chime_message(self.packer, 0))
         can_sends.append(create_chime_message(self.packer, 2))
 
