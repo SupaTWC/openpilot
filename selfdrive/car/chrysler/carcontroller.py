@@ -107,6 +107,11 @@ class CarController:
     new_actuators = CC.actuators.copy()
     new_actuators.steer = self.apply_steer_last / self.params.STEER_MAX
 
+    # tester present - w/ no response (keeps radar disabled)
+    if self.CP.openpilotLongitudinalControl:
+      if self.frame % 25 == 0:
+        can_sends.append((0x753, 0, b"\x02\x3E\x80\x00\x00\x00\x00\x00", 0))
+
     return new_actuators, can_sends
 
   def wheel_button_control(self, CC, CS, can_sends, enabled, das_bus, cancel, resume):
