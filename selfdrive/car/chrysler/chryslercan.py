@@ -85,7 +85,7 @@ def create_acc_1_message(packer, bus, frame):
     "COUNTER": frame % 0x10,
   }
 
-  return packer.make_can_msg("ACC_1", bus)
+  return packer.make_can_msg("ACC_1", bus, values)
 
 def create_das_3_message(packer, bus, frame):
   values = {
@@ -95,7 +95,7 @@ def create_das_3_message(packer, bus, frame):
     "COUNTER": frame % 0x10,
   }
 
-  return packer.make_can_msg("DAS_3", bus)
+  return packer.make_can_msg("DAS_3", bus, values)
 
 def create_das_4_message(packer, bus, frame):
   values = {
