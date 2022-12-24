@@ -51,6 +51,8 @@ const ChryslerAddrs CHRYSLER_ADDRS = {
   .LKAS_COMMAND     = 658,  // LKAS controls from DASM
   .LKAS_HEARTBIT    = 729,  // LKAS HEARTBIT from DASM
   .CRUISE_BUTTONS   = 571,  // Cruise control buttons
+  .DAS_4            = 501,  // ACC engagement states from DASM
+  .ACC_1            = 625,  // ACC set speed
 };
 
 // CAN messages for the 5th gen RAM DT platform
@@ -83,6 +85,9 @@ const CanMsg CHRYSLER_TX_MSGS[] = {
   {CHRYSLER_ADDRS.DAS_6, 0, 8},
   {CHRYSLER_ADDRS.LKAS_HEARTBIT, 0, 5},
   {0x753, 0, 8},
+  {CHRYSLER_ADDRS.DAS_3, 0, 8},
+  {CHRYSLER_ADDRS.DAS_4, 0, 8},
+  {CHRYSLER_ADDRS.ACC_1, 0, 8},
 };
 
 const CanMsg CHRYSLER_RAM_DT_TX_MSGS[] = {
