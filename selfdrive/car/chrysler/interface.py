@@ -126,18 +126,12 @@ class CarInterface(CarInterfaceBase):
   @staticmethod
   def init(CP, logcan, sendcan):
     if CP.openpilotLongitudinalControl:
-      # #send server off to 1F4, see if it prevents acc fault
-      # disable_ecu(logcan, sendcan, bus=0, addr=0x1f4, com_cont_req=b'\x85\x02') 
-      # time.sleep(1)
-      #radar knockout
-      disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x81\x01', rx_offset=-0x280)
-    #keep sending tester  
-    # while CP.openpilotLongitudinalControl:
-    #   can_sends.append([0x753, 0, b"\x02\x3E\x80\x00\x00\x00\x00\x00", 0])
-    # #   sendcan = messaging.pub_sock('sendcan')
-    # #   logcan = messaging.sub_sock('can')
-    # #   IsoTpParallelQuery(sendcan, logcan, 0, [0x753], [b'\x02\x3E\x80'], [b''], rx_offset=-0x280)
-    #   time.sleep(2)
+      disable_ecu(logcan, sendcan, bus=0, addr=0x753, com_cont_req=b'\x28\x81\x01') 
+    while CP.openpilotLongitudinalControl:
+      sendcan = messaging.pub_sock('sendcan')
+      logcan = messaging.sub_sock('can')
+      IsoTpParallelQuery(sendcan, logcan, 0, [0x753], [b'\x02\x3E\x80'], [b''], -0x280,)
+      time.sleep(2)
 
   def _update(self, c):
     ret = self.CS.update(self.cp, self.cp_cam)
