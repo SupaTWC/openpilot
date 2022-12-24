@@ -104,12 +104,12 @@ class CarController:
     if self.frame % 2 == 0:
       can_sends.append(create_das_3_message(self.packer, 0, self.frame))
       can_sends.append(create_acc_1_message(self.packer, 0, self.frame))
-      can_sends.append(create_das_3_message(self.packer, 1, self.frame))
-      can_sends.append(create_acc_1_message(self.packer, 1, self.frame))
+      can_sends.append(create_das_3_message(self.packer, 2, self.frame))
+      can_sends.append(create_acc_1_message(self.packer, 2, self.frame))
 
     if self.frame % 6 == 0:
       can_sends.append(create_das_4_message(self.packer, 0))
-      can_sends.append(create_das_4_message(self.packer, 1))
+      can_sends.append(create_das_4_message(self.packer, 2))
 
     # tester present - w/ no response (keeps radar disabled)
     if self.CP.openpilotLongitudinalControl:
