@@ -248,8 +248,6 @@ class CarState(CarStateBase):
       checks += [
         ("GEAR", 50),
       ]
-      signals += CarState.get_cruise_signals()[0]
-      checks += CarState.get_cruise_signals()[1]
 
     return CANParser(DBC[CP.carFingerprint]["pt"], signals, checks, 0)
 
@@ -267,8 +265,6 @@ class CarState(CarStateBase):
       signals += [
         ("AUTO_HIGH_BEAM_ON", "DAS_6"),
       ]
-      signals += CarState.get_cruise_signals()[0]
-      checks += CarState.get_cruise_signals()[1]
     else:
       # LKAS_HEARTBIT data needs to be forwarded!
       forward_lkas_heartbit_signals = [
