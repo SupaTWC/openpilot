@@ -97,6 +97,7 @@ class CarInterface(CarInterfaceBase):
     ret.enableBsm |= 720 in fingerprint[0]
 
     return ret
+    
   @staticmethod
   def init(CP, logcan, sendcan):
     if CP.openpilotLongitudinalControl:
