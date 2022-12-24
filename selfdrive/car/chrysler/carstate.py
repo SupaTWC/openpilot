@@ -118,7 +118,7 @@ class CarState(CarStateBase):
     else:
       ret.jvePilotCarState.pedalPressedAmount = 0
 
-    ret.jvePilotCarState.accFollowDistance = int(min(3, max(0, cp.vl["DAS_4"]['ACC_DISTANCE_CONFIG_2'])))
+    ret.jvePilotCarState.accFollowDistance = int(min(3, max(0, 3)))
 
     button_events = []
     for buttonType in CHECK_BUTTONS:
@@ -248,6 +248,8 @@ class CarState(CarStateBase):
       checks += [
         ("GEAR", 50),
       ]
+      # signals += CarState.get_cruise_signals()[0]
+      # checks += CarState.get_cruise_signals()[1]
 
     return CANParser(DBC[CP.carFingerprint]["pt"], signals, checks, 0)
 
@@ -265,6 +267,8 @@ class CarState(CarStateBase):
       signals += [
         ("AUTO_HIGH_BEAM_ON", "DAS_6"),
       ]
+      # signals += CarState.get_cruise_signals()[0]
+      # checks += CarState.get_cruise_signals()[1]
     else:
       # LKAS_HEARTBIT data needs to be forwarded!
       forward_lkas_heartbit_signals = [
