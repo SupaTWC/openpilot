@@ -101,15 +101,15 @@ class CarController:
     self.apply_steer_last = apply_steer
 
     can_sends.append(create_lkas_command(self.packer, self.CP, int(apply_steer), lkas_control_bit))
+    if self.frame % 2 == 0:
+      can_sends.append(create_das_3_message(self.packer, 0, self.frame))
+      can_sends.append(create_acc_1_message(self.packer, 0, self.frame))
+      can_sends.append(create_das_3_message(self.packer, 2, self.frame))
+      can_sends.append(create_acc_1_message(self.packer, 2, self.frame))
 
-    can_sends.append(create_das_3_message(self.packer, 0, self.frame))
-    can_sends.append(create_acc_1_message(self.packer, 0, self.frame))
-    can_sends.append(create_das_3_message(self.packer, 1, self.frame))
-    can_sends.append(create_acc_1_message(self.packer, 1, self.frame))
-
-    if self.frame % 3 == 0:
+    if self.frame % 6 == 0:
       can_sends.append(create_das_4_message(self.packer, 0))
-      can_sends.append(create_das_4_message(self.packer, 1))
+      can_sends.append(create_das_4_message(self.packer, 2))
 
     # tester present - w/ no response (keeps radar disabled)
     if self.CP.openpilotLongitudinalControl:

@@ -97,7 +97,7 @@ def create_das_3_message(packer, bus, frame):
 
   return packer.make_can_msg("DAS_3", bus, values)
 
-def create_das_4_message(packer, bus, frame):
+def create_das_4_message(packer, bus):
   values = {
     "ACC_DISTANCE_CONFIG_1": 0x1,
     "ACC_DISTANCE_CONFIG_2": 0x1,
