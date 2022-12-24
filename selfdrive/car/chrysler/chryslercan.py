@@ -91,7 +91,7 @@ def create_das_3_message(packer, bus, frame):
   values = {
     "ENGINE_TORQUE_REQUEST": 0,
     "ACC_DECEL": 32767,
-    "GR_MAX_REQ": 9;
+    # "GR_MAX_REQ": 9;
     "COUNTER": frame % 0x10,
   }
 
