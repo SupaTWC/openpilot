@@ -81,7 +81,7 @@ def create_wheel_buttons_command(packer, bus, frame, buttons):
 
 def create_autostart_button(packer, bus):
   values = {
-    "AUTO_START_BUTTON": 0x24,
+    "AUTO_START_BUTTON": 0x9,
   }
 
   return packer.make_can_msg("AUTO_START_STOP_BUTTON", bus, values)
