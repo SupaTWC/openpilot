@@ -82,5 +82,4 @@ def create_wheel_buttons_command(packer, bus, frame, buttons):
 def create_autostart_button(packer, autostartHeartbit):
   values = autostartHeartbit.copy()
   values["AUTO_START_BUTTON"] = 9
-  print(values)
   return packer.make_can_msg("AUTO_START_STOP_BUTTON", 0, values)
