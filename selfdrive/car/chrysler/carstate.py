@@ -265,6 +265,7 @@ class CarState(CarStateBase):
     ]
     checks = [
       ("DAS_6", 4),
+      ("AUTO_START_STOP_BUTTON", 100),
 
     ]
 
