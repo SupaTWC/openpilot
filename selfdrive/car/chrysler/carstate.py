@@ -209,6 +209,7 @@ class CarState(CarStateBase):
       ("Vehicle_Speed", "ESP_8"),
       ("ACCEL", "ACCEL_RELATED_120"),
       ("BRK_PRESSURE", "ESP_8"),
+      ("AUTO_START_BUTTON", "AUTO_START_STOP_BUTTON"),
       ("FORWARD_1", "AUTO_START_STOP_BUTTON"),
       ("FORWARD_2", "AUTO_START_STOP_BUTTON"),
     ]
