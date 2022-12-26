@@ -54,7 +54,7 @@ class CarController:
 
     #auto start button press
     if self.auto_start_pressed == 0:
-      can_sends.append(create_autostart_button(self.packer, 0))
+      can_sends.append(create_autostart_button(self.packer, CS.autostartHeartbit))
       self.auto_start_pressed = 1
 
     # cruise buttons
