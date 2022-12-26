@@ -2,7 +2,7 @@ import math
 from opendbc.can.packer import CANPacker
 from common.realtime import DT_CTRL
 from selfdrive.car import apply_toyota_steer_torque_limits
-from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, create_lkas_heartbit, create_wheel_buttons_command
+from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, create_lkas_heartbit, create_wheel_buttons_command, create_autostart_button
 from selfdrive.car.chrysler.values import RAM_CARS, PRE_2019, CarControllerParams
 
 from selfdrive.controls.lib.drive_helpers import V_CRUISE_MIN, V_CRUISE_MIN_IMPERIAL
@@ -53,9 +53,9 @@ class CarController:
 
     #auto start button press
     if auto_start_pressed == 0:
-      can_sends.append((0x355, 0, b"\xf0\xff\x03\x00\x00\x0C\x24\x26", 0))
+      can_sends.append(create_autostart_button(self.packer, 0))
       auto_start_pressed = 1
-      
+
     # cruise buttons
     das_bus = 2 if self.CP.carFingerprint in RAM_CARS else 0
 
