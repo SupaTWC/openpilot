@@ -38,7 +38,7 @@ typedef struct {
   const int LKAS_COMMAND;
   const int LKAS_HEARTBIT;
   const int CRUISE_BUTTONS;
-  cosnt int AUTO_START_STOP_BUTTON;
+  const int AUTO_START_STOP_BUTTON;
 } ChryslerAddrs;
 
 // CAN messages for Chrysler/Jeep platforms
