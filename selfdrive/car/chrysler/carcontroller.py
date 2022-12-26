@@ -45,7 +45,6 @@ class CarController:
     self.autoFollowDistanceLock = None
     self.button_frame = 0
     self.last_target = 0
-    self.auto_start_pressed = 0
 
   def update(self, CC, CS):
     can_sends = []
@@ -53,10 +52,10 @@ class CarController:
     lkas_active = CC.latActive and self.lkas_control_bit_prev
 
     #auto start button press
-    if self.frame %25 and self.auto_start_pressed == 0:
+    if self.frame % 25 == 0 and self.autostartDisabled:
       can_sends.append(create_autostart_button(self.packer, CS.autostartHeartbit))
-      self.auto_start_pressed = 1
-      print(self.auto_start_pressed)
+      #self.auto_start_pressed = 1
+      print(self.autostartDisabled)
 
     # cruise buttons
     das_bus = 2 if self.CP.carFingerprint in RAM_CARS else 0

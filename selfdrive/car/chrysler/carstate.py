@@ -38,6 +38,7 @@ class CarState(CarStateBase):
 
     self.lkasHeartbit = None
     self.autostartHeartbit = None
+    self.autostartDisabled = None
 
   def update(self, cp, cp_cam):
     ret = car.CarState.new_message()
@@ -96,6 +97,7 @@ class CarState(CarStateBase):
     ret.accFaulted = cp_cruise.vl["DAS_3"]["ACC_FAULTED"] != 0
     self.lkasHeartbit = cp_cam.vl["LKAS_HEARTBIT"]
     self.autostartHeartbit = cp.vl["AUTO_START_STOP_BUTTON"]
+    self.autostartDisabled = cp.vl["AUTO_STOP_START"]["AUTO_STOP_START_DASH"] == 1
 
     if self.CP.carFingerprint in RAM_CARS:
       self.auto_high_beam = cp_cam.vl["DAS_6"]['AUTO_HIGH_BEAM_ON']  # Auto High Beam isn't Located in this message on chrysler or jeep currently located in 729 message
@@ -212,6 +214,7 @@ class CarState(CarStateBase):
       ("AUTO_START_BUTTON", "AUTO_START_STOP_BUTTON"),
       ("FORWARD_1", "AUTO_START_STOP_BUTTON"),
       ("FORWARD_2", "AUTO_START_STOP_BUTTON"),
+      ("AUTO_STOP_START_DASH", "AUTO_STOP_START"),
     ]
 
     checks = [
@@ -228,7 +231,8 @@ class CarState(CarStateBase):
       ("ESP_8", 50),
       ("ACCEL_RELATED_120", 50),
       ("TRACTION_BUTTON", 1),
-      ("AUTO_START_STOP_BUTTON", 100),
+      ("AUTO_START_STOP_BUTTON", 25),
+      ("AUTO_STOP_START", 25),
     ]
 
     if CP.enableBsm:
