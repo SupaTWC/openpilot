@@ -38,7 +38,7 @@ class CarState(CarStateBase):
 
     self.lkasHeartbit = None
     self.autostartHeartbit = None
-    
+
   def update(self, cp, cp_cam):
     ret = car.CarState.new_message()
 
@@ -260,9 +260,12 @@ class CarState(CarStateBase):
     signals = [
       # sig_name, sig_address, default
       ("CAR_MODEL", "DAS_6"),
+      ("FORWARD_1", "AUTO_START_STOP_BUTTON")
+      ("FORWARD_2", "AUTO_START_STOP_BUTTON")
     ]
     checks = [
       ("DAS_6", 4),
+
     ]
 
     if CP.carFingerprint in RAM_CARS:
