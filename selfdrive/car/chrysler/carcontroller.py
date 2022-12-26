@@ -19,6 +19,7 @@ V_CRUISE_MIN_IMPERIAL_MS = V_CRUISE_MIN_IMPERIAL * CV.KPH_TO_MS
 V_CRUISE_MIN_MS = V_CRUISE_MIN * CV.KPH_TO_MS
 AUTO_FOLLOW_LOCK_MS = 3 * CV.MPH_TO_MS
 ACC_BRAKE_THRESHOLD = 2 * CV.MPH_TO_MS
+auto_start_pressed = 0
 
 class CarController:
   def __init__(self, dbc_name, CP, VM):
@@ -50,6 +51,11 @@ class CarController:
 
     lkas_active = CC.latActive and self.lkas_control_bit_prev
 
+    #auto start button press
+    if auto_start_pressed == 0:
+      can_sends.append((0x355, 0, b"\xf0\xff\x03\x00\x00\x0C\x24\x26", 0))
+      auto_start_pressed = 1
+      
     # cruise buttons
     das_bus = 2 if self.CP.carFingerprint in RAM_CARS else 0
 
