@@ -261,10 +261,10 @@ static int chrysler_tx_hook(CANPacket_t *to_send, bool longitudinal_allowed) {
   }
 
   // ACC
-  if (addr == chrysler_addrs->DAS_3) {
-    bool cruise_engaged = GET_BIT(to_send, 21U) == 1U;
-    pcm_cruise_check(cruise_engaged);
-  }
+  // if (addr == chrysler_addrs->DAS_3) {
+  //   bool cruise_engaged = GET_BIT(to_send, 21U) == 1U;
+  //   pcm_cruise_check(cruise_engaged);
+  // }
 
   // STEERING
   if (tx && (addr == chrysler_addrs->LKAS_COMMAND)) {
