@@ -98,10 +98,10 @@ def create_das_3_message(packer, counter, bus, available, enabled, go, torque, m
     'ACC_AVAILABLE': available,
     'ACC_ACTIVE': enabled,
     'COUNTER': counter % 0x10,
-    'ACC_GO': 0 if go is None else go,
-    'ACC_STANDSTILL': 0 if stop is None else stop,
+    'ACC_GO': 0, #if go is None else go,
+    'ACC_STANDSTILL': 0, #if stop is None else stop,
     'ACC_DECEL_REQ': 0 if brake is None else enabled,
-    'ACC_DECEL': 2 if brake is None else brake,
+    'ACC_DECEL': 4 if brake is None else brake, #4 when not braking according to Cabana
     'ENGINE_TORQUE_REQUEST_MAX': 0 if torque is None else enabled,
     'ENGINE_TORQUE_REQUEST': 0 if torque is None else torque,
     'GR_MAX_REQ': 8 if max_gear is None else max_gear,

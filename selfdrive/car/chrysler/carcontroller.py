@@ -310,8 +310,8 @@ class CarController:
     override_request = CS.out.gasPressed or CS.out.brakePressed
     fidget_stopped_brake_frame = CS.out.standstill and self.frame % 2 == 0  # change brake to keep Jeep stopped
     if not override_request:
-      stop_req = long_stopping or (CS.out.standstill and aTarget <= 0)
-      go_req = not stop_req and CS.out.standstill
+      stop_req = long_stopping #or (CS.out.standstill and aTarget <= 0)
+      go_req = not stop_req #and CS.out.standstill
 
       if go_req:
         under_accel_frame_count = self.under_accel_frame_count = START_ADJUST_ACCEL_FRAMES  # ready to add torq
@@ -339,7 +339,7 @@ class CarController:
           self.last_torque = None
 
       if stop_req:
-        brake = self.last_brake = aTarget + (0.01 if fidget_stopped_brake_frame else 0.0)
+        brake = self.last_brake = aTarget #+ (0.01 if fidget_stopped_brake_frame else 0.0)
         torque = self.last_torque = None
       elif go_req:
         brake = self.last_brake = None
@@ -383,7 +383,7 @@ class CarController:
                            go_req,
                            torque,
                            self.max_gear,
-                           stop_req and not fidget_stopped_brake_frame,
+                           stop_req,
                            brake))
     can_sends.append(
       create_das_3_message(self.packer, self.frame / 2, 2,
@@ -392,7 +392,7 @@ class CarController:
                            go_req,
                            torque,
                            self.max_gear,
-                           stop_req and not fidget_stopped_brake_frame,
+                           stop_req,
                            brake))
 
     if brake is not None:
