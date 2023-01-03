@@ -304,10 +304,7 @@ class CarController:
       return None
 
     #long
-    under_accel_frame_count = 0
-    #aTarget = CC.actuators.accel
     self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
-    #vTarget = CC.jvePilotState.carControl.vTargetFuture
 
     override_request = CS.out.gasPressed or CS.out.brakePressed
     if not override_request:
@@ -394,41 +391,6 @@ class CarController:
                            decel))
 
 
-
-  def torque(self, CS, aTarget, vTarget):
-    return (self.vehicleMass * aTarget * vTarget) / (.105 * CS.engineRpm)
-
-  def acc_gas(self, CS, aTarget, vTarget, under_accel_frame_count):
-    if aTarget > 0:
-      # adjust for hills and towing
-      offset = aTarget - CS.out.aEgo
-      if offset > UNDER_ACCEL_THRESHOLD:
-        under_accel_frame_count = self.under_accel_frame_count + 1  # inc under accelerating frame count
-
-    time_for_sample = 1  # self.op_params.get('long_time_constant')
-    self.last_brake = None
-
-    # desired Velocity(m/s) = (acceleration(m/s^2) * time(s)) + velocity(m/s)
-    desired_velocity = ((aTarget - CS.out.aEgo) * time_for_sample) + CS.out.vEgo
-    # kinetic energy (J) = 1/2 * mass (kg) * velocity (m/s)^2
-    # use the kinetic energy from the desired velocity - the kinetic energy from the current velocity to get the change in velocity
-    kinetic_energy = (.5 * self.CP.mass * desired_velocity * abs(desired_velocity)) - (
-          .5 * self.CP.mass * (CS.out.vEgo ** 2))
-    # convert kinetic energy to torque
-    # torque(NM) = (kinetic energy (J) * 9.55414 (Nm/J) * time(s))/RPM
-    torque = (kinetic_energy * 9.55414 * time_for_sample) / (CS.engineRpm + 0.001)
-    torque = clip(torque, -6, 6)  # clip torque to -6 to 6 Nm for sanity
-
-    if CS.engineTorque < 0 and torque > 0:
-      torque += 0
-
-    # If torque is positive, add the engine torque to the torque we calculated. This is because the engine torque is the torque the engine is producing.
-    else:
-      torque += CS.engineTorque
-
-    self.last_torque = max(CS.torqMin + 1, min(CS.torqMax, torque))
-
-    return under_accel_frame_count
 
   def acc_brake(self, aTarget):
     brake_target = aTarget
