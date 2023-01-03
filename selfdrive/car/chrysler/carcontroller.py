@@ -309,7 +309,7 @@ class CarController:
     override_request = CS.out.gasPressed or CS.out.brakePressed
     if not override_request:
       #braking
-      if CC.actuators.accel < - self.op_params.get('brake_threshold'):
+      if CC.actuators.accel < - 0.1:
         accel_req = 0
         decel_req = 0
         torque = None
@@ -317,9 +317,9 @@ class CarController:
         self.max_gear = 8
       #accelerating
       else:
-        time_for_sample = self.op_params.get('long_time_constant')
-        torque_limits = self.op_params.get('torque_limits')
-        drivetrain_efficiency = self.op_params.get('drivetrain_efficiency')
+        time_for_sample = 0.15
+        torque_limits = 50
+        drivetrain_efficiency = 0.85
         self.last_brake = None
         accel_req = 1
         decel_req = 0
@@ -364,7 +364,6 @@ class CarController:
       self.last_torque = None
       self.last_brake = None
       decel_req = None
-      brake = None
       accel_req = 0
       torque = None
       self.max_gear = 8
