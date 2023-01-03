@@ -13,6 +13,7 @@ from cereal import car
 from selfdrive.car.chrysler.interface import CarInterface, GAS_RESUME_SPEED
 import math
 from common.numpy_fast import clip
+from common.op_params import opParams
 
 ButtonType = car.CarState.ButtonEvent.Type
 LongCtrlState = car.CarControl.Actuators.LongControlState
@@ -302,105 +303,97 @@ class CarController:
 
       return None
 
+    #long
     under_accel_frame_count = 0
-    aTarget = CC.actuators.accel
-    vTarget = CC.jvePilotState.carControl.vTargetFuture
-    long_stopping = CC.actuators.longControlState == LongCtrlState.stopping
+    #aTarget = CC.actuators.accel
+    self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
+    #vTarget = CC.jvePilotState.carControl.vTargetFuture
 
     override_request = CS.out.gasPressed or CS.out.brakePressed
-    fidget_stopped_brake_frame = CS.out.standstill and self.frame % 2 == 0  # change brake to keep Jeep stopped
     if not override_request:
-      stop_req = long_stopping #or (CS.out.standstill and aTarget <= 0)
-      go_req = not stop_req #and CS.out.standstill
-
-      if go_req:
-        under_accel_frame_count = self.under_accel_frame_count = START_ADJUST_ACCEL_FRAMES  # ready to add torq
+      #braking
+      if CC.actuators.accel < - self.op_params.get('brake_threshold'):
+        accel_req = False
+        decel_req = False
+        torque = None
+        decel = self.acc_brake(self.accel)
+        self.max_gear = 8
+      #accelerating
+      else:
+        time_for_sample = self.op_params.get('long_time_constant')
+        torque_limits = self.op_params.get('torque_limits')
+        drivetrain_efficiency = self.op_params.get('drivetrain_efficiency')
         self.last_brake = None
+        accel_req = True
+        decel_req = False
+        # delta_accel = CC.actuators.accel - CS.out.aEgo
 
-      currently_braking = self.last_brake is not None
-      speed_to_far_off = abs(CS.out.vEgo - vTarget) > COAST_WINDOW
-      engine_brake = TORQ_BRAKE_MAX < aTarget < 0 and not speed_to_far_off and vTarget > LOW_WINDOW \
-                     and self.torque(CS, aTarget, vTarget) > CS.torqMin
+        # distance_moved = ((delta_accel * time_for_sample**2)/2) + (CS.out.vEgo * time_for_sample)
+        # torque = (self.CP.mass * delta_accel * distance_moved * time_for_sample)/((drivetrain_efficiency * CS.engineRpm * 2 * math.pi) / 60)
 
-      if go_req or ((aTarget >= 0 or engine_brake) and not currently_braking):  # gas
-        under_accel_frame_count = self.acc_gas(CS, aTarget, vTarget, under_accel_frame_count)
+        # # force (N) = mass (kg) * acceleration (m/s^2)
+        # force = self.CP.mass * delta_accel
+        # # distance_moved (m) =  (acceleration(m/s^2) * time(s)^2 / 2) + velocity(m/s) * time(s)
+        # distance_moved = ((delta_accel) * (time_for_sample**2))/2) + (CS.out.vEgo * time_for_sample)
+        # # work (J) = force (N) * distance (m)
+        # work = force * distance_moved
+        # # Power (W)= work(J) * time (s)
+        # power = work * time_for_sample
+        # # torque = Power (W) / (RPM * 2 * pi / 60)
+        # torque = power/((drivetrain_efficiency * CS.engineRpm * 2 * math.pi) / 60)
+        desired_velocity = ((self.accel-CS.out.aEgo) * time_for_sample) + CS.out.vEgo
+        # kinetic energy (J) = 1/2 * mass (kg) * velocity (m/s)^2
+        # use the kinetic energy from the desired velocity - the kinetic energy from the current velocity to get the change in velocity
+        kinetic_energy = ((self.CP.mass * desired_velocity **2)/2) - ((self.CP.mass * CS.out.vEgo**2)/2)
+        # convert kinetic energy to torque
+        # torque(NM) = (kinetic energy (J) * 9.55414 (Nm/J) * time(s))/RPM
+        torque = (kinetic_energy * 9.55414 * time_for_sample)/(drivetrain_efficiency * CS.engineRpm + 0.001)
+        torque = clip(torque, -torque_limits, torque_limits) # clip torque to -6 to 6 Nm for sanity
 
-      elif aTarget < 0:  # brake
-        self.acc_brake(CS, aTarget, vTarget, speed_to_far_off)
+        if CS.engineTorque < 0 and torque > 0:
+          #If the engine is producing negative torque, we need to return to a reasonable torque value quickly.
+          # rough estimate of external forces in N
+          total_forces = 650
+          #torque required to maintain speed
+          torque = (total_forces * CS.out.vEgo * 9.55414)/(CS.engineRpm * drivetrain_efficiency + 0.001)
 
-      elif self.last_brake is not None:  # let up on the brake
-        self.last_brake += BRAKE_CHANGE
-        if self.last_brake >= 0:
-          self.last_brake = None
+        #If torque is positive, add the engine torque to the torque we calculated. This is because the engine torque is the torque the engine is producing.
+        else:
+          torque += CS.engineTorque
 
-      elif self.last_torque is not None:  # let up on gas
-        self.last_torque -= TORQ_RELEASE_CHANGE
-        if self.last_torque <= max(0, CS.torqMin):
-          self.last_torque = None
+        decel = None
 
-      if stop_req:
-        brake = self.last_brake = aTarget #+ (0.01 if fidget_stopped_brake_frame else 0.0)
-        torque = self.last_torque = None
-      elif go_req:
-        brake = self.last_brake = None
-        torque = math.floor(self.last_torque * 100) / 100
-      elif self.last_brake:
-        brake = math.floor(self.last_brake * 100) / 100
-        torque = self.last_torque = None
-      elif self.last_torque:
-        brake = self.last_brake = None
-        torque = math.floor(self.last_torque * 100) / 100
-      else:  # coasting
-        brake = self.last_brake = None
-        torque = self.last_torque = None
     else:
       self.last_torque = None
       self.last_brake = None
       self.max_gear = None
-      stop_req = None
+      decel_req = None
       brake = None
-      go_req = None
+      accel_req = None
       torque = None
+      self.max_gear = 8
 
-    if under_accel_frame_count == 0:
-      self.max_gear = None
-    elif under_accel_frame_count > CAN_DOWNSHIFT_ACCEL_FRAMES:
-      if CS.out.vEgo < vTarget - COAST_WINDOW / CarInterface.accel_max(CS) \
-         and CS.out.aEgo < CarInterface.accel_max(CS) / 5 \
-         and torque > CS.torqMax * 0.98:  # Time to downshift?
-        if CS.currentGear > 3 and CS.engineRpm < 4500:
-          self.max_gear = CS.currentGear - 1
-          under_accel_frame_count = 0
-
-    self.under_accel_frame_count = under_accel_frame_count
-
-    can_sends.append(acc_log(self.packer, 0, aTarget, vTarget, long_stopping, CS.out.standstill))
-
+ 
     can_sends.append(
       create_das_3_message(self.packer, self.frame / 2, 0,
                            CS.out.cruiseState.available,
                            CS.out.cruiseState.enabled,
-                           go_req,
+                           accel_req,
                            torque,
                            self.max_gear,
-                           stop_req,
-                           brake))
+                           decel_req,
+                           decel))
     can_sends.append(
       create_das_3_message(self.packer, self.frame / 2, 2,
                            CS.out.cruiseState.available,
                            CS.out.cruiseState.enabled,
-                           go_req,
+                           accel_req,
                            torque,
                            self.max_gear,
-                           stop_req,
-                           brake))
+                           decel_req,
+                           decel))
 
-    if brake is not None:
-      return brake
-    elif torque is not None:
-      accel = 0 if CS.out.vEgo == 0 else (torque * .105 * CS.engineRpm) / (self.vehicleMass * CS.out.vEgo)  # torque back to accel
-      return accel
-    return 0
+
 
   def torque(self, CS, aTarget, vTarget):
     return (self.vehicleMass * aTarget * vTarget) / (.105 * CS.engineRpm)
@@ -437,17 +430,12 @@ class CarController:
 
     return under_accel_frame_count
 
-  def acc_brake(self, CS, aTarget, vTarget, speed_to_far_off):
-    brake_target = max(CarControllerParams.ACCEL_MIN, round(aTarget, 2))
+  def acc_brake(self, aTarget):
+    brake_target = aTarget
     if self.last_brake is None:
       self.last_brake = min(0., brake_target / 2)
-    elif self.last_brake < -.2 and CS.out.aEgo < brake_target:  # are we slowing too much?
-      self.last_brake += (BRAKE_CHANGE / 10)
     else:
       tBrake = brake_target
-      if not speed_to_far_off and 0 >= tBrake >= -1:  # let up on brake as we approach
-        tBrake = (tBrake * 1.1) + .1
-
       lBrake = self.last_brake
       if tBrake < lBrake:
         diff = min(BRAKE_CHANGE, (lBrake - tBrake) / 2)
@@ -455,6 +443,7 @@ class CarController:
       elif tBrake - lBrake > 0.01:  # don't let up unless it's a big enough jump
         diff = min(BRAKE_CHANGE, (tBrake - lBrake) / 2)
         self.last_brake = min(lBrake + diff, tBrake)
+    return self.last_brake
 
   def acc_hysteresis(self, new_target):
     if new_target > self.last_target:
