@@ -13,7 +13,7 @@ from cereal import car
 from selfdrive.car.chrysler.interface import CarInterface, GAS_RESUME_SPEED
 import math
 from common.numpy_fast import clip
-from common.op_params import opParams
+#from common.op_params import opParams
 
 ButtonType = car.CarState.ButtonEvent.Type
 LongCtrlState = car.CarControl.Actuators.LongControlState
