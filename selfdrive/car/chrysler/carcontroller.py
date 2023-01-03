@@ -310,8 +310,8 @@ class CarController:
     if not override_request:
       #braking
       if CC.actuators.accel < - self.op_params.get('brake_threshold'):
-        accel_req = False
-        decel_req = False
+        accel_req = 0
+        decel_req = 0
         torque = None
         decel = self.acc_brake(self.accel)
         self.max_gear = 8
@@ -321,8 +321,8 @@ class CarController:
         torque_limits = self.op_params.get('torque_limits')
         drivetrain_efficiency = self.op_params.get('drivetrain_efficiency')
         self.last_brake = None
-        accel_req = True
-        decel_req = False
+        accel_req = 1
+        decel_req = 0
         # delta_accel = CC.actuators.accel - CS.out.aEgo
 
         # distance_moved = ((delta_accel * time_for_sample**2)/2) + (CS.out.vEgo * time_for_sample)
@@ -363,10 +363,9 @@ class CarController:
     else:
       self.last_torque = None
       self.last_brake = None
-      self.max_gear = None
       decel_req = None
       brake = None
-      accel_req = None
+      accel_req = 0
       torque = None
       self.max_gear = 8
 

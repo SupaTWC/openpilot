@@ -93,13 +93,13 @@ def acc_log(packer, adjustment, aTarget, vTarget, stopping, standstill):
   return packer.make_can_msg("ACC_LOG", 0, values)
 
 
-def create_das_3_message(packer, counter, bus, available, enabled, go, torque, max_gear, stop, brake):
+def create_das_3_message(packer, counter, bus, available, enabled, torque, max_gear, stop, brake):
   values = {
     'ACC_AVAILABLE': available,
     'ACC_ACTIVE': enabled,
     'COUNTER': counter % 0x10,
-    'ACC_GO': 0, #if go is None else go,
-    'ACC_STANDSTILL': 0, #if stop is None else stop,
+    #'ACC_GO': 0, #if go is None else go,
+    #'ACC_STANDSTILL': 0, #if stop is None else stop, decel_req
     'ACC_DECEL_REQ': 0 if brake is None else enabled,
     'ACC_DECEL': 4 if brake is None else brake, #4 when not braking according to Cabana
     'ENGINE_TORQUE_REQUEST_MAX': 0 if torque is None else enabled,
