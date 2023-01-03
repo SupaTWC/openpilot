@@ -298,8 +298,8 @@ class CarController:
       self.last_torque = None
       self.max_gear = None
 
-      can_sends.append(create_das_3_message(self.packer, self.frame / 2, 0, CS.out.cruiseState.available, CS.out.cruiseState.enabled, False, False, 8, False, 0))
-      can_sends.append(create_das_3_message(self.packer, self.frame / 2, 2, CS.out.cruiseState.available, CS.out.cruiseState.enabled, False, False, 8, False, 2))
+      can_sends.append(create_das_3_message(self.packer, self.frame / 2, 0, CS.out.cruiseState.available, CS.out.cruiseState.enabled, False, 8, False, 0))
+      can_sends.append(create_das_3_message(self.packer, self.frame / 2, 2, CS.out.cruiseState.available, CS.out.cruiseState.enabled, False, 8, False, 0))
 
       return None
 
@@ -373,7 +373,6 @@ class CarController:
       create_das_3_message(self.packer, self.frame / 2, 0,
                            CS.out.cruiseState.available,
                            CS.out.cruiseState.enabled,
-                           accel_req,
                            torque,
                            self.max_gear,
                            decel_req,
@@ -382,7 +381,6 @@ class CarController:
       create_das_3_message(self.packer, self.frame / 2, 2,
                            CS.out.cruiseState.available,
                            CS.out.cruiseState.enabled,
-                           accel_req,
                            torque,
                            self.max_gear,
                            decel_req,
