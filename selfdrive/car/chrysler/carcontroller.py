@@ -367,6 +367,7 @@ class CarController:
       accel_req = 0
       torque = None
       self.max_gear = 8
+      decel = None
 
  
     can_sends.append(
