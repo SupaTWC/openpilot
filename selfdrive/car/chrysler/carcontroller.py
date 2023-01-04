@@ -377,7 +377,7 @@ class CarController:
                            torque,
                            self.max_gear,
                            decel_req,
-                           decel))
+                           decel, accel_req))
     can_sends.append(
       create_das_3_message(self.packer, self.frame / 2, 2,
                            CS.out.cruiseState.available,
@@ -385,7 +385,7 @@ class CarController:
                            torque,
                            self.max_gear,
                            decel_req,
-                           decel))
+                           decel, accel_req))
 
 
 
