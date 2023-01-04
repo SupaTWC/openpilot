@@ -70,11 +70,11 @@ class CarInterface(CarInterfaceBase):
       tune = ret.longitudinalTuning
       tune.deadzoneBP = [0., 9.]
       tune.deadzoneV = [.0, .15]
-      tune.kpV = [0.25]
+      tune.kpV = [2.5]
       tune.kiV = [0.05]
       ret.longitudinalActuatorDelayUpperBound = 0.5 # s
       ret.stoppingDecelRate = 0.3 
-      
+
     # Jeep
     elif candidate in (CAR.JEEP_CHEROKEE, CAR.JEEP_CHEROKEE_2019):
       ret.experimentalLongitudinalAvailable = True
