@@ -71,9 +71,14 @@ class CarInterface(CarInterfaceBase):
       tune.deadzoneBP = [0., 9.]
       tune.deadzoneV = [.0, .15]
       tune.kpV = [2.5]
-      tune.kiV = [0.05]
+      tune.kiV = [0.0]
+      ret.longitudinalActuatorDelayLowerBound = 0.5
       ret.longitudinalActuatorDelayUpperBound = 0.5 # s
       ret.stoppingDecelRate = 0.3 
+      ret.stoppingControl = True
+      ret.startingState = True
+      ret.vEgoStarting = 0.5 #default 0.5, hyundai 0.1
+      ret.startAccel = 2.0
 
     # Jeep
     elif candidate in (CAR.JEEP_CHEROKEE, CAR.JEEP_CHEROKEE_2019):
