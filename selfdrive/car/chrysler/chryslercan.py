@@ -104,16 +104,18 @@ def create_das_3_message(packer, counter, bus, available, enabled, torque, max_g
     'ACC_DECEL': 4 if brake is None else brake, #4 when not braking according to Cabana
     'ENGINE_TORQUE_REQUEST_MAX': 0 if torque is None else enabled,
     'ENGINE_TORQUE_REQUEST': 0 if torque is None else torque,
-    'GR_MAX_REQ': 8 if max_gear is None else max_gear,
+    'GR_MAX_REQ': 9 if max_gear is None else max_gear,
+    'DISABLE_FUEL_SHUTOFF': 0 if go is None else go,
   }
 
 
   return packer.make_can_msg("DAS_3", bus, values)
 
-def create_acc_1_message(packer, bus, frame):
+def create_acc_1_message(packer, bus, frame, speed):
   values = {
     "ACCEL_PERHAPS": 32767,
     "COUNTER": frame % 0x10,
+    "SPEED": speed * CV.MS_TO_KPH,
   }
 
   return packer.make_can_msg("ACC_1", bus, values)

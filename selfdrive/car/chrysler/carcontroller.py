@@ -275,8 +275,8 @@ class CarController:
     if not CS.longControl or self.frame % 2 != 0:
       return None
 
-    can_sends.append(create_acc_1_message(self.packer, 0, self.frame / 2))
-    can_sends.append(create_acc_1_message(self.packer, 2, self.frame / 2))
+    can_sends.append(create_acc_1_message(self.packer, 0, self.frame / 2, CS.out.vEgo))
+    can_sends.append(create_acc_1_message(self.packer, 2, self.frame / 2, CS.out.vEgo))
 
     if self.frame % 6 == 0:
       state = 0
@@ -314,10 +314,10 @@ class CarController:
         decel_req = 0
         torque = None
         decel = self.acc_brake(self.accel)
-        self.max_gear = 8
+        self.max_gear = 9
       #accelerating
       else:
-        time_for_sample = 0.15
+        time_for_sample = 1
         torque_limits = 50
         drivetrain_efficiency = 0.85
         self.last_brake = None
@@ -338,7 +338,8 @@ class CarController:
         # power = work * time_for_sample
         # # torque = Power (W) / (RPM * 2 * pi / 60)
         # torque = power/((drivetrain_efficiency * CS.engineRpm * 2 * math.pi) / 60)
-        desired_velocity = ((self.accel-CS.out.aEgo) * time_for_sample) + CS.out.vEgo
+        calc_velocity = ((self.accel-CS.out.aEgo) * time_for_sample) + CS.out.vEgo
+        desired_velocity = max(calc_velocity, CS.out.cruiseState.speed)
         # kinetic energy (J) = 1/2 * mass (kg) * velocity (m/s)^2
         # use the kinetic energy from the desired velocity - the kinetic energy from the current velocity to get the change in velocity
         kinetic_energy = ((self.CP.mass * desired_velocity **2)/2) - ((self.CP.mass * CS.out.vEgo**2)/2)
@@ -366,7 +367,7 @@ class CarController:
       decel_req = None
       accel_req = 0
       torque = None
-      self.max_gear = 8
+      self.max_gear = 9
       decel = None
 
  
