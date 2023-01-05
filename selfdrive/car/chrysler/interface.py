@@ -75,10 +75,10 @@ class CarInterface(CarInterfaceBase):
       ret.longitudinalActuatorDelayLowerBound = 0.5
       ret.longitudinalActuatorDelayUpperBound = 0.5 # s
       ret.stoppingDecelRate = 0.3 
-      ret.stoppingControl = True
-      ret.startingState = False
-      ret.vEgoStarting = 0.1 #default 0.5, hyundai 0.1
-      ret.startAccel = 2.0
+      #ret.stoppingControl = True
+      #ret.startingState = False
+      #ret.vEgoStarting = 0.1 #default 0.5, hyundai 0.1
+      #ret.startAccel = 2.0
 
     # Jeep
     elif candidate in (CAR.JEEP_CHEROKEE, CAR.JEEP_CHEROKEE_2019):
