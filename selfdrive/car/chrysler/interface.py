@@ -76,8 +76,8 @@ class CarInterface(CarInterfaceBase):
       ret.longitudinalActuatorDelayUpperBound = 0.5 # s
       ret.stoppingDecelRate = 0.3 
       ret.stoppingControl = True
-      ret.startingState = True
-      ret.vEgoStarting = 0.5 #default 0.5, hyundai 0.1
+      ret.startingState = False
+      ret.vEgoStarting = 0.1 #default 0.5, hyundai 0.1
       ret.startAccel = 2.0
 
     # Jeep
