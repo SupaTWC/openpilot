@@ -68,8 +68,8 @@ class CarInterface(CarInterfaceBase):
       if candidate in (CAR.PACIFICA_2018, CAR.PACIFICA_2020):
         ret.experimentalLongitudinalAvailable = True
       tune = ret.longitudinalTuning
-      tune.deadzoneBP = [0., 9.]
-      tune.deadzoneV = [.0, .15]
+      tune.deadzoneBP = [0]#[0., 9.]
+      tune.deadzoneV = [0]#[.0, .15]
       tune.kpV = [2.5]
       tune.kiV = [0.0]
       #ret.longitudinalActuatorDelayLowerBound = 0.5
