@@ -166,8 +166,8 @@ class CarInterface(CarInterfaceBase):
       events.add(car.CarEvent.EventName.buttonCancel)  # cancel button pressed
     elif ret.cruiseState.enabled and not self.CS.out.cruiseState.enabled:
       events.add(car.CarEvent.EventName.pcmEnable)  # cruse is enabled
-    elif (not ret.cruiseState.enabled) and (ret.vEgo > GAS_RESUME_SPEED or (self.CS.out.cruiseState.enabled and (not ret.standstill))):
-      events.add(car.CarEvent.EventName.pcmDisable)  # give up, too fast to resume
+    # elif (not ret.cruiseState.enabled) and (ret.vEgo > GAS_RESUME_SPEED or (self.CS.out.cruiseState.enabled and (not ret.standstill))):
+    #   events.add(car.CarEvent.EventName.pcmDisable)  # give up, too fast to resume
 
     if self.CS.longControl:
       if ret.brakePressed and not self.CS.out.brakePressed:
