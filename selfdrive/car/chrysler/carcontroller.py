@@ -182,6 +182,8 @@ class CarController:
           torque += CS.engineTorque
         #Value for sending accleration
         accel_req = 1 #if self.last_standstill == 1 else 0
+        if CS.out.vEgo == 0: 
+          can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
         decel_req = 0
         decel = 4
         max_gear = 9
