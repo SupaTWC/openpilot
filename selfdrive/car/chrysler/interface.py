@@ -51,8 +51,8 @@ class CarInterface(CarInterfaceBase):
       tune.deadzoneV = [0]#[.0, .15]
       tune.kpV = [1.0]
       tune.kiV = [0.0]
-      ret.longitudinalActuatorDelayLowerBound = 0.25
-      ret.longitudinalActuatorDelayUpperBound = 0.25 # s
+      ret.longitudinalActuatorDelayLowerBound = 0.6
+      ret.longitudinalActuatorDelayUpperBound = 0.6 # s
       ret.stoppingDecelRate = 0.3 
       #ret.stoppingControl = True
       ret.startingState = True
