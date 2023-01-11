@@ -180,9 +180,12 @@ class CarController:
         #If torque is positive, add the engine torque to the torque we calculated. This is because the engine torque is the torque the engine is producing.
         else:
           torque += CS.engineTorque
+          if CS.out.vEgo < 2.2:
+            torque += 100
         #Value for sending accleration
         accel_req = 1 #if self.last_standstill == 1 else 0
-        if CS.out.vEgo == 0: 
+        if self.last_standstill == 1:#CS.out.vEgo == 0: 
+          can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
           can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
         decel_req = 0
         decel = 4
