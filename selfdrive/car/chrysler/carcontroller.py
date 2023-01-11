@@ -124,10 +124,13 @@ class CarController:
         decel_req = 1
         torque = 0
         decel = self.acc_brake(self.accel)
-        max_gear = 8
+        if 1 == 2: #use OP's accel instead
+          decel = CC.actuators.accel
+        max_gear = 9
         if (decel < -1.9 and decel > -2.1 and CS.out.vEgo == 0):
           stand_still = 1
           self.last_standstill = 1
+          max_gear = 2
         else: 
           stand_still = 0
           self.last_standstill = 0
