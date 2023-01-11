@@ -159,9 +159,9 @@ class CarController:
         # torque = power/((drivetrain_efficiency * CS.engineRpm * 2 * math.pi) / 60)
         self.calc_velocity = ((self.accel-CS.out.aEgo) * time_for_sample) + CS.out.vEgo
         if 1==2: #self.op_params.get('comma_speed'):
-          self.desired_velocity = min(CC.actuators.accel, CS.out.cruiseState.speed)
+          self.desired_velocity = min(CC.actuators.accel, CC.hudControl.setSpeed)
         else:
-          self.desired_velocity = min(self.calc_velocity, CS.out.cruiseState.speed)
+          self.desired_velocity = min(self.calc_velocity, CC.hudControl.setSpeed)
         # kinetic energy (J) = 1/2 * mass (kg) * velocity (m/s)^2
         # use the kinetic energy from the desired velocity - the kinetic energy from the current velocity to get the change in velocity
         kinetic_energy = ((self.CP.mass * self.desired_velocity **2)/2) - ((self.CP.mass * CS.out.vEgo**2)/2)
