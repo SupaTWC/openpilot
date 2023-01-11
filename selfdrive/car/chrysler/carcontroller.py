@@ -115,7 +115,7 @@ class CarController:
       #calculating acceleration/torque
       self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
 
-      brake_threshold = -self.op_params.get('brake_threshold') if CS.out.vEgo > 2.25 else 0
+      brake_threshold = -0.2 if CS.out.vEgo > 2.25 else 0
       #Braking
       if CC.actuators.accel < brake_threshold: 
       #stopping = CC.actuators.longControlState == car.CarControl.Actuators.LongControlState
@@ -134,9 +134,9 @@ class CarController:
 
       #Acclerating
       else:
-        time_for_sample = self.op_params.get('long_time_constant')
-        torque_limits = self.op_params.get('torque_limits')
-        drivetrain_efficiency = self.op_params.get('drivetrain_efficiency')
+        time_for_sample = 0.25
+        torque_limits = 15
+        drivetrain_efficiency = 0.85
         self.last_brake = None
 
         # delta_accel = CC.actuators.accel - CS.out.aEgo
@@ -199,74 +199,24 @@ class CarController:
           decel = 0
           stand_still = 0
 
-          can_sends.append(acc_command(self.packer, self.frame / 2, 0,
-                             CS.out.cruiseState.available,
-                             CS.out.cruiseState.enabled,
-                             accel_req,
-                             torque,
-                             max_gear,
-                             decel_req,
-                             decel,
-                             0, 1, stand_still))
-          can_sends.append(acc_command(self.packer, self.frame / 2, 2,
-                              CS.out.cruiseState.available,
-                              CS.out.cruiseState.enabled,
-                              accel_req,
-                              torque,
-                              max_gear,
-                              decel_req,
-                              decel,
-                              0, 1, stand_still))
-        # #OP not enabled  
-        # elif not CS.longEnabled or not CS.out.cruiseState.enabled: 
-        #   self.last_brake = None
-        #   self.last_standstill = 0
-        #   self.max_gear = 9
-        #   decel_req = 0
-        #   accel_req = 0
-        #   torque = 0
-        #   max_gear = 9
-        #   decel = 0
-        #   stand_still = 0
-
-        #   can_sends.append(acc_command(self.packer, self.frame / 2, 0,
-        #                      CS.out.cruiseState.available,
-        #                      CS.out.cruiseState.enabled,
-        #                      accel_req,
-        #                      torque,
-        #                      max_gear,
-        #                      decel_req,
-        #                      decel,
-        #                      0, 1, stand_still))
-        #   can_sends.append(acc_command(self.packer, self.frame / 2, 2,
-        #                       CS.out.cruiseState.available,
-        #                       CS.out.cruiseState.enabled,
-        #                       accel_req,
-        #                       torque,
-        #                       max_gear,
-        #                       decel_req,
-        #                       decel,
-        #                       0, 1, stand_still))
-
-        else: #send acceleration torque calculated from above
-          can_sends.append(acc_command(self.packer, self.frame / 2, 0,
-                             CS.out.cruiseState.available,
-                             CS.out.cruiseState.enabled,
-                             accel_req,
-                             torque,
-                             max_gear,
-                             decel_req,
-                             decel,
-                             0, 1, stand_still))
-          can_sends.append(acc_command(self.packer, self.frame / 2, 2,
-                              CS.out.cruiseState.available,
-                              CS.out.cruiseState.enabled,
-                              accel_req,
-                              torque,
-                              max_gear,
-                              decel_req,
-                              decel,
-                              0, 1, stand_still))
+        can_sends.append(acc_command(self.packer, self.frame / 2, 0,
+                            CS.out.cruiseState.available,
+                            CS.out.cruiseState.enabled,
+                            accel_req,
+                            torque,
+                            max_gear,
+                            decel_req,
+                            decel,
+                            0, 1, stand_still))
+        can_sends.append(acc_command(self.packer, self.frame / 2, 2,
+                            CS.out.cruiseState.available,
+                            CS.out.cruiseState.enabled,
+                            accel_req,
+                            torque,
+                            max_gear,
+                            decel_req,
+                            decel,
+                            0, 1, stand_still))
 
         if self.frame % 2 == 0:
           can_sends.append(create_acc_1_message(self.packer, 0, self.frame / 2))
