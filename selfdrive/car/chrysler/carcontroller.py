@@ -181,7 +181,7 @@ class CarController:
         else:
           torque += CS.engineTorque
           if CS.out.vEgo < 2.2:
-            torque += 50
+            torque += 20
         #Value for sending accleration
         accel_req = 1 #if self.last_standstill == 1 else 0
         if self.last_standstill == 1:#CS.out.vEgo == 0: 
