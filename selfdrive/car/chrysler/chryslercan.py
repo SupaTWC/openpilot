@@ -141,3 +141,13 @@ def create_chime_message(packer, bus):
     # "CHIME_REQ_R": 1 if (chime_timer > 0 and (gap_timer == 0 or gap_timer == chimegap_time)) else 0
   }
   return packer.make_can_msg("CHIME", bus, values)
+  
+def acc_log(packer, aTarget, vTarget, calcvTarget, aActual, vActual):
+  values = {
+    'OP_A_TARGET': aTarget,
+    'OP_V_TARGET': vTarget,
+    'CALC_V_TARGET': calcvTarget,
+    'OP_A_ACTUAL': aActual,
+    'OP_V_ACTUAL': vActual,
+  }
+  return packer.make_can_msg("ACC_LOG", 0, values)
