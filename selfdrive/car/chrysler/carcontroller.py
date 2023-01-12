@@ -39,6 +39,7 @@ class CarController:
     self.desired_velocity = 0
     self.calc_velocity = 0
     self.last_standstill = 0
+    self.resume_pressed = 0
 
   def update(self, CC, CS):
     can_sends = []
@@ -115,7 +116,7 @@ class CarController:
       #calculating acceleration/torque
       self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
 
-      brake_threshold = -0.2 if CS.out.vEgo > 2.25 else 0
+      brake_threshold = 0 if CS.out.vEgo > 2.25 else 0
       #Braking
       if CC.actuators.accel < brake_threshold: 
       #stopping = CC.actuators.longControlState == car.CarControl.Actuators.LongControlState
@@ -132,10 +133,11 @@ class CarController:
           #stand_still = 0
           self.last_standstill = 0
         # keep the braking level of eVgo 1.0m/s until completely stopped, then max braking
-        if self.last_brake is not None and CS.out.vEgo > 0.001 and CS.out.vEgo < 1.0: 
-          decel = max(decel, self.last_brake) 
+        # if self.last_brake is not None and CS.out.vEgo > 0.001 and CS.out.vEgo < 1.0: 
+        #   decel = max(decel, self.last_brake) 
           
         self.last_brake = decel
+        self.resume_pressed = 0
 
       #Acclerating
       else:
@@ -168,8 +170,9 @@ class CarController:
         decel = 4
         max_gear = 9
         #stand_still = 0
-        #if CS.out.vEgo <= 0.1: 
-        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))    
+        if accel_req == 1 and self.resume_pressed == 1: 
+          can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
+          self.resume_pressed = 1   
         #self.last_standstill = 0
 
         
@@ -186,6 +189,7 @@ class CarController:
           max_gear = 9
           decel = 0
           #stand_still = 0
+          self.resume_pressed = 0
 
         can_sends.append(acc_command(self.packer, self.frame / 2, 0,
                             CS.out.cruiseState.available,

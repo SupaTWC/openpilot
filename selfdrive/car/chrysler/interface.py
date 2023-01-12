@@ -47,8 +47,8 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kiBP = [[9., 20.], [9., 20.]]
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.15, 0.30], [0.03, 0.05]]
       ret.lateralTuning.pid.kf = 0.00006
-      tune.deadzoneBP = [0.0]
-      tune.deadzoneV = [0]
+      tune.deadzoneBP = [0., 9.]
+      tune.deadzoneV = [.0, .15]
       tune.kpV = [1.0]
       tune.kiV = [0.0]
       ret.longitudinalActuatorDelayLowerBound = 0.5
@@ -57,6 +57,7 @@ class CarInterface(CarInterfaceBase):
       #ret.stoppingControl = True
       ret.startingState = False
       ret.vEgoStarting = 0.1 #default 0.5, hyundai 0.1
+      ret.vEgoStopping = 0.5
       #ret.startAccel = 1.0
       ret.pcmCruise = False #no stock set speed
 
