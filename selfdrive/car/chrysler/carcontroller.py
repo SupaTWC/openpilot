@@ -126,14 +126,15 @@ class CarController:
         decel = CC.actuators.accel # self.acc_brake(self.accel)
         max_gear = 8
         if (decel < -1.95 and decel > -2.05 and CS.out.vEgo <=0.001):
-          stand_still = 1
+          #stand_still = 1
           self.last_standstill = 1
         else: 
-          stand_still = 0
+          #stand_still = 0
           self.last_standstill = 0
-        # approaching standstill: if continuing braking and the car is not completely stopped, don't apply -2.0 brake unless the car was already braking at -2.0m/s  
-        if self.last_brake is not None and decel > self.last_brake and CS.out.vEgo > 0.001 and CS.out.vEgo < 0.2:
-          decel = self.last_brake
+        # keep the braking level of eVgo 1.0m/s until completely stopped, then max braking
+        if self.last_brake is not None and CS.out.vEgo > 0.001 and CS.out.vEgo < 1.0: 
+          decel = max(decel, self.last_brake) 
+          
         self.last_brake = decel
 
       #Acclerating
