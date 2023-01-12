@@ -166,7 +166,7 @@ class CarController:
         decel = 4
         max_gear = 9
         #stand_still = 0
-        if CS.out.vEgo <= 0.001: 
+        if CS.out.vEgo <= 0.1: 
           can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))    
         #self.last_standstill = 0
 
