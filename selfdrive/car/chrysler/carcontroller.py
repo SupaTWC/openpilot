@@ -141,7 +141,7 @@ class CarController:
 
       #Acclerating
       else:
-        time_for_sample = 3
+        time_for_sample = 0.5
         torque_limits = 15
         drivetrain_efficiency = 0.85
         self.last_brake = None
