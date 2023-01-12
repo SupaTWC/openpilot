@@ -128,7 +128,7 @@ class CarState(CarStateBase):
       self.lkasHeartbit = cp_cam.vl["LKAS_HEARTBIT"]
       self.inputSpeed = cp.vl["TRANS_SPEED"]["INPUT_SPEED"]
       self.tcLocked = cp.vl["TRANS_SPEED"]["TC_LOCKED"]
-      self.tcSlipPct = 1 - (self.inputSpeed/(self.engineRpm+0.001))
+      self.tcSlipPct = (self.inputSpeed/(self.engineRpm+0.001)) +0.001
       
 
 
