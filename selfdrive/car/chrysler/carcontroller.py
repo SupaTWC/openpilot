@@ -158,7 +158,7 @@ class CarController:
           torque = (total_forces * CS.out.vEgo * 9.55414)/(CS.engineRpm * drivetrain_efficiency + 0.001)
 
         else:
-          if CS.out.vEgo < 2.5:
+          if CS.out.vEgo < 15:
             torque +=20
           torque += CS.engineTorque
 
