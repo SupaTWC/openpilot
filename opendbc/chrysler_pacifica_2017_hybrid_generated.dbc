@@ -277,8 +277,10 @@ BO_ 878 ACCEL_RELATED_36E: 8 XXX
  SG_ ACCEL_OR_RPM_2 : 15|8@0+ (1,0) [0|255] "" XXX
  SG_ ACCEL_OR_RPM_1 : 7|8@0+ (1,0) [0|255] "" XXX
 
-BO_ 324 SPEED_2: 8 XXX
- SG_ SPEED_2 : 31|16@0+ (0.01,0) [0|255] "m/s" XXX
+BO_ 324 TRANS_SPEED: 8 XXX
+ SG_ TC_LOCKED : 17|1@1+ (1,0) [0|0] ""  XXX
+ SG_ OUTPUT_SPEED : 31|16@0+ (1,0) [0|65534] "rpm" XXX
+ SG_ INPUT_SPEED : 47|16@0+ (1,0) [0|65534] "rpm"  XXX
 
 BO_ 832 UNKNOWN_340: 8 XXX
  SG_ SPEED_DIGITAL : 63|8@0+ (1,0) [0|255] "mph" XXX
@@ -306,13 +308,6 @@ BO_ 680 TCM_A7: 8 ECM
  SG_ CurrentGear : 16|4@1+ (1,0) [0|0] ""  ECM,DASM,CBC
  SG_ CurrentGearForDisplay : 20|4@1+ (1,0) [0|0] ""  ECM,IC
  SG_ TargetGear : 24|4@1+ (1,0) [0|0] ""  ECM,DASM,CBC
-
-BO_ 509 ACC_LOG: 8 XXX
- SG_ CALC_V_TARGET : 23|8@0+ (0.1,0) [0|25.5] "m/s" XXX
- SG_ OP_V_TARGET : 15|8@0+ (0.1,0) [0|25.5] "m/s" XXX
- SG_ OP_A_TARGET : 7|8@0- (0.05,0) [-6.3|6.3] "m/s2" XXX
- SG_ OP_A_ACTUAL : 31|8@0- (0.05,0) [-6.3|6.3] "m/s2" XXX
- SG_ OP_V_ACTUAL : 39|8@0+ (0.1,0) [0|25.5] "m/s" XXX
 
 CM_ SG_ 653 BRAKE_PRESSURE "max seems to be 148";
 CM_ SG_ 746 PRNDL "5=L, 4=D, 3=N, 2=R, 1=P";
