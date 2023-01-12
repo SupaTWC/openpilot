@@ -131,6 +131,10 @@ class CarController:
         else: 
           stand_still = 0
           self.last_standstill = 0
+        # approaching standstill: if continuing braking and the car is not completely stopped, don't apply -2.0 brake unless the car was already braking at -2.0m/s  
+        if self.last_brake is not None and decel > self.last_brake and CS.out.vEgo > 0.001 and CS.out.vEgo < 0.2:
+          decel = self.last_brake
+        self.last_brake = decel
 
       #Acclerating
       else:
@@ -161,7 +165,7 @@ class CarController:
         decel = 4
         max_gear = 9
         #stand_still = 0
-        if CS.out.vEgo < 0.001: 
+        if CS.out.vEgo <= 0.001: 
           can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))    
         #self.last_standstill = 0
 
