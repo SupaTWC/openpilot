@@ -142,7 +142,7 @@ class CarController:
       #Acclerating
       else:
         time_for_sample = 0.5
-        torque_limits = 15
+        torque_limits = 50
         drivetrain_efficiency = 0.85
         self.last_brake = None
 
@@ -155,14 +155,14 @@ class CarController:
           torque = torque/CS.tcSlipPct
         torque = clip(torque, -torque_limits, torque_limits) # clip torque to -6 to 6 Nm for sanity
 
-        if CS.engineTorque < 0 and torque > 0:
-          total_forces = 650
-          torque = (total_forces * CS.out.vEgo * 9.55414)/(CS.engineRpm * drivetrain_efficiency + 0.001)
+        # if CS.engineTorque < 0 and torque > 0:
+        #   total_forces = 650
+        #   torque = (total_forces * CS.out.vEgo * 9.55414)/(CS.engineRpm * drivetrain_efficiency + 0.001)
 
-        else:
-          if CS.out.vEgo < 3:
-            torque +=0
-          torque += CS.engineTorque
+        # else:
+        #   if CS.out.vEgo < 3:
+        #     torque +=0
+        torque += CS.engineTorque if CS.engineTorque >0 else 0
 
         torque = max(torque, 0)#(0 - self.op_params.get('min_torque')))
         accel_req = 1 #if self.last_standstill == 1 else 0
