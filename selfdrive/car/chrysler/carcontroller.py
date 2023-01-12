@@ -158,6 +158,8 @@ class CarController:
           torque = (total_forces * CS.out.vEgo * 9.55414)/(CS.engineRpm * drivetrain_efficiency + 0.001)
 
         else:
+          if CS.out.vEgo < 2.5:
+            torque +=20
           torque += CS.engineTorque
 
         torque = max(torque, 0)#(0 - self.op_params.get('min_torque')))
@@ -166,8 +168,8 @@ class CarController:
         decel = 4
         max_gear = 9
         #stand_still = 0
-        if CS.out.vEgo <= 0.1: 
-          can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))    
+        #if CS.out.vEgo <= 0.1: 
+        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))    
         #self.last_standstill = 0
 
         
