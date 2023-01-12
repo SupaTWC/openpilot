@@ -115,7 +115,7 @@ class CarController:
       #calculating acceleration/torque
       self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
 
-      brake_threshold = -0.0 if CS.out.vEgo > 2.25 else 0
+      brake_threshold = -0.2 if CS.out.vEgo > 2.25 else 0
       #Braking
       if CC.actuators.accel < brake_threshold: 
       #stopping = CC.actuators.longControlState == car.CarControl.Actuators.LongControlState

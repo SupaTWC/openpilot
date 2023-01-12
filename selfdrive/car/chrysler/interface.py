@@ -48,7 +48,7 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.15, 0.30], [0.03, 0.05]]
       ret.lateralTuning.pid.kf = 0.00006
       tune.deadzoneBP = [0.0]
-      tune.deadzoneV = [0.2]
+      tune.deadzoneV = [0]
       tune.kpV = [1.0]
       tune.kiV = [0.0]
       ret.longitudinalActuatorDelayLowerBound = 0.5
