@@ -129,6 +129,7 @@ class CarState(CarStateBase):
       self.inputSpeed = cp.vl["TRANS_SPEED"]["INPUT_SPEED"]
       self.tcLocked = cp.vl["TRANS_SPEED"]["TC_LOCKED"]
       self.tcSlipPct = 1 - (self.inputSpeed/(self.engineRpm+0.001))
+      
 
 
     if self.CP.carFingerprint in RAM_CARS:
