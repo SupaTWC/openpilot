@@ -170,9 +170,10 @@ class CarController:
         decel = 4
         max_gear = 9
         #stand_still = 0
-        if accel_req == 1 and self.resume_pressed == 1: 
+        if accel_req == 1 and self.resume_pressed < 4: 
           can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
-          self.resume_pressed = 1   
+          self.resume_pressed += 1 
+          
         #self.last_standstill = 0
 
         
