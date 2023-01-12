@@ -70,8 +70,8 @@ class CarState(CarStateBase):
     else:
       ret.vEgoRaw = (cp.vl["SPEED_1"]["SPEED_LEFT"] + cp.vl["SPEED_1"]["SPEED_RIGHT"]) / 2.
       ret.gearShifter = self.parse_gear_shifter(self.shifter_values.get(cp.vl["GEAR"]["PRNDL"], None))
-    if self.op_params.get('use_smoothed_accel'):
-        ret.vEgoRaw = cp.vl["ESP_1"]["Vehicle_Speed"] * CV.KPH_TO_MS
+    #if self.op_params.get('use_smoothed_accel'):
+    #    ret.vEgoRaw = cp.vl["ESP_1"]["Vehicle_Speed"] * CV.KPH_TO_MS
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
     ret.standstill = False #not ret.vEgoRaw > 0.001
     ret.wheelSpeeds = self.get_wheel_speeds(
