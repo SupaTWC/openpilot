@@ -77,6 +77,9 @@ class CarController:
             CS.button_pressed(ButtonType.decelCruise) or \
             CS.button_pressed(ButtonType.resumeCruise):
           CS.longEnabled = True
+          #forward the resume button press to the car
+          if CS.button_pressed(ButtonType.resumeCruise):
+            can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
     # steering
     if self.frame % 2 == 0:
       
