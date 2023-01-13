@@ -9,7 +9,6 @@ from common.conversions import Conversions as CV
 from common.params import Params, put_nonblocking
 import math
 
-from common.op_params import opParams
 
 ButtonType = car.CarState.ButtonEvent.Type
 LongCtrlState = car.CarControl.Actuators.LongControlState
@@ -35,7 +34,6 @@ class CarController:
     # long
     self.last_brake = None
     self.max_gear = 8
-    self.op_params = opParams()
     self.desired_velocity = 0
     self.calc_velocity = 0
     self.last_standstill = 0
