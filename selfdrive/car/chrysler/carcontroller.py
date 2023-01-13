@@ -40,6 +40,7 @@ class CarController:
     self.calc_velocity = 0
     self.last_standstill = 0
     self.resume_pressed = 0
+    self.accel_req = 0
 
   def update(self, CC, CS):
     can_sends = []
@@ -77,9 +78,10 @@ class CarController:
             CS.button_pressed(ButtonType.decelCruise) or \
             CS.button_pressed(ButtonType.resumeCruise):
           CS.longEnabled = True
-          #forward the resume button press to the car
-          if CS.button_pressed(ButtonType.resumeCruise):
-            can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
+          self.resume_pressed = 0
+          # #forward the resume button press to the car
+          # if CS.button_pressed(ButtonType.resumeCruise):
+          #   can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
     # steering
     if self.frame % 2 == 0:
       
@@ -124,7 +126,7 @@ class CarController:
       if CC.actuators.accel < brake_threshold: 
       #stopping = CC.actuators.longControlState == car.CarControl.Actuators.LongControlState
       #if stopping:
-        accel_req = 0
+        self.accel_req = 0
         decel_req = 1
         torque = 0
         decel = CC.actuators.accel # self.acc_brake(self.accel)
@@ -169,14 +171,14 @@ class CarController:
         torque += CS.engineTorque if CS.engineTorque >0 else 0
 
         torque = max(torque, 0)#(0 - self.op_params.get('min_torque')))
-        accel_req = 1 #if self.last_standstill == 1 else 0
+        self.accel_req = 1 #if self.last_standstill == 1 else 0
         decel_req = 0
         decel = 4
         max_gear = 9
         #stand_still = 0
-        if accel_req == 1 and CS.button_counter % 14 == 0: 
+        if self.accel_req == 1 and CS.button_counter % 10 == 0 and self.resume_pressed < 2: 
           can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
-          #self.resume_pressed += 1 
+          self.resume_pressed += 1 
           
         #self.last_standstill = 0
 
@@ -189,17 +191,17 @@ class CarController:
           self.last_brake = None
           self.last_standstill = 0
           decel_req = 0
-          accel_req = 0
+          self.accel_req = 0
           torque = 0
           max_gear = 9
           decel = 0
           #stand_still = 0
-          self.resume_pressed = 0
         can_sends.append(acc_log(self.packer, CC.actuators.accel, CC.actuators.speed, self.calc_velocity, CS.out.aEgo, CS.out.vEgo))
+        
         can_sends.append(acc_command(self.packer, self.frame / 2, 0,
                             CS.out.cruiseState.available,
                             CS.out.cruiseState.enabled,
-                            accel_req,
+                            self.accel_req,
                             torque,
                             max_gear,
                             decel_req,
@@ -208,7 +210,7 @@ class CarController:
         can_sends.append(acc_command(self.packer, self.frame / 2, 2,
                             CS.out.cruiseState.available,
                             CS.out.cruiseState.enabled,
-                            accel_req,
+                            self.accel_req,
                             torque,
                             max_gear,
                             decel_req,
@@ -243,7 +245,7 @@ class CarController:
         can_sends.append(acc_command(self.packer, das_3_counter, 0, 
                                     1, 
                                     CC.enabled,
-                                    accel_req,
+                                    self.accel_req,
                                     torque,
                                     max_gear,
                                     decel_req,
