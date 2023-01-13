@@ -145,17 +145,11 @@ class CarController:
       #Acclerating
       else:
         time_for_sample = 0.5
-        torque_limits = 50
+        torque_limits = 80
         drivetrain_efficiency = 0.85
         self.last_brake = None
-
-        self.desired_velocity = min(CC.actuators.speed, CC.hudControl.setSpeed)
-
-        kinetic_energy = ((self.CP.mass * self.desired_velocity **2)/2) - ((self.CP.mass * CS.out.vEgo**2)/2)
-        
-        torque = (kinetic_energy * 9.55414 * time_for_sample)/(drivetrain_efficiency * CS.engineRpm + 0.001)
-        if self.CP.carFingerprint not in RAM_CARS and not CS.tcLocked and CS.tcSlipPct > 0:
-          torque = torque/CS.tcSlipPct
+        # 1 kilogram metre per second (kgf m/s) of power equals: 9.81 Newtons meter/second (N m/s) in power https://www.traditionaloven.com/tutorials/power/convert-kgf-metre-seconds-to-newton-metre-seconds.html
+        torque = (self.CP.mass * CC.actuators.accel * 9.81/500)
         self.calc_velocity = torque
         torque = clip(torque, -torque_limits, torque_limits) # clip torque to -6 to 6 Nm for sanity
         

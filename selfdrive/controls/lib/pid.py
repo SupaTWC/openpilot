@@ -61,7 +61,7 @@ class PIDController():
   def update(self, error, error_rate=0.0, speed=0.0, override=False, feedforward=0., freeze_integrator=False):
     self.speed = speed
 
-    if self.islong:
+    if 1==2:#self.islong:
       if self.op_params.get('long_p') != self._k_p or self.op_params.get('long_i') != self._k_i:
         self._update_params()
       self.p = float(error) * self._k_p
