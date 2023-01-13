@@ -1,7 +1,7 @@
 from opendbc.can.packer import CANPacker
 from common.realtime import DT_CTRL
 from selfdrive.car import apply_toyota_steer_torque_limits
-from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, create_cruise_buttons, acc_command, create_acc_1_message, create_das_4_message, create_chime_message#, create_lkas_heartbit
+from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, create_cruise_buttons, acc_command, create_acc_1_message, create_das_4_message, create_chime_message, acc_log#, create_lkas_heartbit
 from selfdrive.car.chrysler.values import CAR, RAM_CARS, RAM_DT, RAM_HD, CarControllerParams
 from cereal import car
 from common.numpy_fast import clip
@@ -156,8 +156,9 @@ class CarController:
         torque = (kinetic_energy * 9.55414 * time_for_sample)/(drivetrain_efficiency * CS.engineRpm + 0.001)
         if self.CP.carFingerprint not in RAM_CARS and not CS.tcLocked and CS.tcSlipPct > 0:
           torque = torque/CS.tcSlipPct
+        self.calc_velocity = torque
         torque = clip(torque, -torque_limits, torque_limits) # clip torque to -6 to 6 Nm for sanity
-
+        
         # if CS.engineTorque < 0 and torque > 0:
         #   total_forces = 650
         #   torque = (total_forces * CS.out.vEgo * 9.55414)/(CS.engineRpm * drivetrain_efficiency + 0.001)
@@ -194,7 +195,7 @@ class CarController:
           decel = 0
           #stand_still = 0
           self.resume_pressed = 0
-
+        can_sends.append(acc_log(self.packer, CC.actuators.accel, CC.actuators.speed, self.calc_velocity, CS.out.aEgo, CS.out.vEgo))
         can_sends.append(acc_command(self.packer, self.frame / 2, 0,
                             CS.out.cruiseState.available,
                             CS.out.cruiseState.enabled,

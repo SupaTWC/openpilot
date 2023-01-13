@@ -309,6 +309,13 @@ BO_ 680 TCM_A7: 8 ECM
  SG_ CurrentGearForDisplay : 20|4@1+ (1,0) [0|0] ""  ECM,IC
  SG_ TargetGear : 24|4@1+ (1,0) [0|0] ""  ECM,DASM,CBC
 
+BO_ 509 ACC_LOG: 8 XXX
+ SG_ CALC_V_TARGET : 23|8@0+ (0.1,0) [0|25.5] "m/s" XXX
+ SG_ OP_V_TARGET : 15|8@0+ (0.1,0) [0|25.5] "m/s" XXX
+ SG_ OP_A_TARGET : 7|8@0- (0.05,0) [-6.3|6.3] "m/s2" XXX
+ SG_ OP_A_ACTUAL : 31|8@0- (0.05,0) [-6.3|6.3] "m/s2" XXX
+ SG_ OP_V_ACTUAL : 39|8@0+ (0.1,0) [0|25.5] "m/s" XXX
+
 CM_ SG_ 653 BRAKE_PRESSURE "max seems to be 148";
 CM_ SG_ 746 PRNDL "5=L, 4=D, 3=N, 2=R, 1=P";
 CM_ SG_ 320 BRAKE_PRESSED_2 "Value is 5 when brake is pressed by human, 1 when ACC brake";
