@@ -157,9 +157,9 @@ class CarController:
         
         self.torque = (kinetic_energy * 9.55414 * time_for_sample)/(drivetrain_efficiency * CS.engineRpm + 0.001)
         if self.CP.carFingerprint not in RAM_CARS and not CS.tcLocked and CS.tcSlipPct > 0:
-          self.torque = torque/CS.tcSlipPct
-        self.calc_velocity = torque
-        self.torque = clip(torque, -torque_limits, torque_limits) # clip torque to -6 to 6 Nm for sanity
+          self.torque = self.torque/CS.tcSlipPct
+        self.calc_velocity = self.torque
+        self.torque = clip(self.torque, -torque_limits, torque_limits) # clip torque to -6 to 6 Nm for sanity
         
         # if CS.engineTorque < 0 and torque > 0:
         #   total_forces = 650
@@ -170,7 +170,7 @@ class CarController:
         #     torque +=0
         self.torque += CS.engineTorque if CS.engineTorque >0 else 0
 
-        self.torque = max(torque, 0)#(0 - self.op_params.get('min_torque')))
+        self.torque = max(self.torque, 0)#(0 - self.op_params.get('min_torque')))
         self.accel_req = 1 if self.go_sent < 5 else 0
         decel_req = 0
         decel = 4
