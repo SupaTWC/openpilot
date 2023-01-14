@@ -195,10 +195,6 @@ class CarController:
           #stand_still = 0
         
 
-      if self.frame % 25 == 0:
-        if self.accel_req == 1 and CS.button_counter % 10 == 0 and self.resume_pressed < 2: 
-          can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
-          
         can_sends.append(acc_log(self.packer, CC.actuators.accel, CC.actuators.speed, self.calc_velocity, CS.out.aEgo, CS.out.vEgo))
         
         can_sends.append(acc_command(self.packer, self.frame / 2, 0,
@@ -245,6 +241,7 @@ class CarController:
 
         if self.frame % 25 == 0 and self.accel_req == 1 and self.resume_pressed < 2:
           can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
+          self.resume_pressed += 1
           
           
       else: 
