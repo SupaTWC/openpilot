@@ -242,11 +242,14 @@ class CarController:
           can_sends.append(create_chime_message(self.packer, 0))
           can_sends.append(create_chime_message(self.packer, 2))
 
-        if CS.button_counter == 8:
-          if (self.accel_req == 1 or self.go_sent == 1) and self.resume_pressed < 2:
-            can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
-            self.resume_pressed += 1
-          else: can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons))
+        
+        if (self.accel_req == 1 or self.go_sent == 1) and self.resume_pressed == 0:
+          #self.target_resume = (CS.button_counter + 5)%16 
+          can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
+          
+          self.resume_pressed = 1
+          
+        #else: can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons))
           
           
       else: 
