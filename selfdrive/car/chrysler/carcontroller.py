@@ -42,6 +42,8 @@ class CarController:
     self.resume_pressed = 0
     self.accel_req = 0
     self.last_standstill = 0
+    self.previous_counter = 100
+    self.torque = 0
 
   def update(self, CC, CS):
     can_sends = []
@@ -129,7 +131,7 @@ class CarController:
       #if stopping:
         self.accel_req = 0
         decel_req = 1
-        torque = 0
+        self.torque = 0
         decel = CC.actuators.accel # self.acc_brake(self.accel)
         max_gear = 8
         if (decel < -1.95 and decel > -2.05 and CS.out.vEgo <=0.001):
@@ -137,11 +139,7 @@ class CarController:
           self.last_standstill = 1
         else: 
           #stand_still = 0
-          self.last_standstill = 1
-        # keep the braking level of eVgo 1.0m/s until completely stopped, then max braking
-        # if self.last_brake is not None and CS.out.vEgo > 0.001 and CS.out.vEgo < 1.0: 
-        #   decel = max(decel, self.last_brake) 
-          
+          self.last_standstill = 1          
         self.last_brake = decel
         self.resume_pressed = 0
         self.go_sent = 0
@@ -157,11 +155,11 @@ class CarController:
 
         kinetic_energy = ((self.CP.mass * self.desired_velocity **2)/2) - ((self.CP.mass * CS.out.vEgo**2)/2)
         
-        torque = (kinetic_energy * 9.55414 * time_for_sample)/(drivetrain_efficiency * CS.engineRpm + 0.001)
+        self.torque = (kinetic_energy * 9.55414 * time_for_sample)/(drivetrain_efficiency * CS.engineRpm + 0.001)
         if self.CP.carFingerprint not in RAM_CARS and not CS.tcLocked and CS.tcSlipPct > 0:
-          torque = torque/CS.tcSlipPct
+          self.torque = torque/CS.tcSlipPct
         self.calc_velocity = torque
-        torque = clip(torque, -torque_limits, torque_limits) # clip torque to -6 to 6 Nm for sanity
+        self.torque = clip(torque, -torque_limits, torque_limits) # clip torque to -6 to 6 Nm for sanity
         
         # if CS.engineTorque < 0 and torque > 0:
         #   total_forces = 650
@@ -170,9 +168,9 @@ class CarController:
         # else:
         #   if CS.out.vEgo < 3:
         #     torque +=0
-        torque += CS.engineTorque if CS.engineTorque >0 else 0
+        self.torque += CS.engineTorque if CS.engineTorque >0 else 0
 
-        torque = max(torque, 0)#(0 - self.op_params.get('min_torque')))
+        self.torque = max(torque, 0)#(0 - self.op_params.get('min_torque')))
         self.accel_req = 1 if self.go_sent < 5 else 0
         decel_req = 0
         decel = 4
@@ -191,10 +189,11 @@ class CarController:
           self.last_standstill = 0
           decel_req = 0
           self.accel_req = 0
-          torque = 0
+          self.torque = 0
           max_gear = 9
           decel = 0
           self.go_sent = 0
+          self.resume_pressed = 0
           #stand_still = 0
         
 
@@ -204,7 +203,7 @@ class CarController:
                             CS.out.cruiseState.available,
                             CS.out.cruiseState.enabled,
                             self.accel_req,
-                            torque,
+                            self.torque,
                             max_gear,
                             decel_req,
                             decel,
@@ -213,7 +212,7 @@ class CarController:
                             CS.out.cruiseState.available,
                             CS.out.cruiseState.enabled,
                             self.accel_req,
-                            torque,
+                            self.torque,
                             max_gear,
                             decel_req,
                             decel,
@@ -242,14 +241,6 @@ class CarController:
           can_sends.append(create_chime_message(self.packer, 0))
           can_sends.append(create_chime_message(self.packer, 2))
 
-        
-        if (self.accel_req == 1 or self.go_sent == 1) and self.resume_pressed == 0:
-          #self.target_resume = (CS.button_counter + 5)%16 
-          can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
-          
-          self.resume_pressed = 1
-          
-        #else: can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons))
           
           
       else: 
@@ -258,11 +249,16 @@ class CarController:
                                     1, 
                                     CC.enabled,
                                     self.accel_req,
-                                    torque,
+                                    self.torque,
                                     max_gear,
                                     decel_req,
                                     decel,
                                     CS.das_3))
+    #resume button control, might work on RAM too?
+    if (self.resume_pressed < 4 and self.torque > 0.1) and self.previous_counter != CS.button_counter:
+      can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
+      self.resume_pressed += 1
+      self.previous_counter = CS.button_counter
 
     # HUD alerts
     if self.frame % 25 == 0:
