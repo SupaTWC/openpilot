@@ -38,6 +38,8 @@ class CarController:
     self.calc_velocity = 0
     self.last_standstill = 0
     self.resume_pressed = 0
+    self.torque = 0
+    self.previous_counter = 100
 
   def update(self, CC, CS):
     can_sends = []
@@ -124,7 +126,7 @@ class CarController:
       #if stopping:
         accel_req = 0
         decel_req = 1
-        torque = 0
+        self.torque = 0
         decel = CC.actuators.accel # self.acc_brake(self.accel)
         max_gear = 8
         if (decel < -1.95 and decel > -2.05 and CS.out.vEgo <=0.001):
@@ -147,9 +149,9 @@ class CarController:
         drivetrain_efficiency = 0.85
         self.last_brake = None
         # 1 kilogram metre per second (kgf m/s) of power equals: 9.81 Newtons meter/second (N m/s) in power https://www.traditionaloven.com/tutorials/power/convert-kgf-metre-seconds-to-newton-metre-seconds.html
-        torque = (self.CP.mass * CC.actuators.accel * 9.81/500)
-        self.calc_velocity = torque
-        torque = clip(torque, -torque_limits, torque_limits) # clip torque to -6 to 6 Nm for sanity
+        self.torque = (self.CP.mass * CC.actuators.accel * 9.81/500)
+        self.calc_velocity = self.torque
+        self.torque = clip(self.torque, -torque_limits, torque_limits) # clip torque to -6 to 6 Nm for sanity
         
         # if CS.engineTorque < 0 and torque > 0:
         #   total_forces = 650
@@ -158,17 +160,15 @@ class CarController:
         # else:
         #   if CS.out.vEgo < 3:
         #     torque +=0
-        torque += CS.engineTorque if CS.engineTorque >0 else 0
+        self.torque += CS.engineTorque if CS.engineTorque >0 else 0
 
-        torque = max(torque, 0)#(0 - self.op_params.get('min_torque')))
+        self.torque = max(self.torque, 0)#(0 - self.op_params.get('min_torque')))
         accel_req = 1 #if self.last_standstill == 1 else 0
         decel_req = 0
         decel = 4
         max_gear = 9
         #stand_still = 0
-        if self.CS.button_counter == 8 and self.resume_pressed < 2: 
-          can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
-          self.resume_pressed += 1 
+        
           
         #self.last_standstill = 0
 
@@ -182,7 +182,7 @@ class CarController:
           self.last_standstill = 0
           decel_req = 0
           accel_req = 0
-          torque = 0
+          self.torque = 0
           max_gear = 9
           decel = 0
           #stand_still = 0
@@ -192,7 +192,7 @@ class CarController:
                             CS.out.cruiseState.available,
                             CS.out.cruiseState.enabled,
                             accel_req,
-                            torque,
+                            self.torque,
                             max_gear,
                             decel_req,
                             decel,
@@ -201,7 +201,7 @@ class CarController:
                             CS.out.cruiseState.available,
                             CS.out.cruiseState.enabled,
                             accel_req,
-                            torque,
+                            self.torque,
                             max_gear,
                             decel_req,
                             decel,
@@ -236,11 +236,16 @@ class CarController:
                                     1, 
                                     CC.enabled,
                                     accel_req,
-                                    torque,
+                                    self.torque,
                                     max_gear,
                                     decel_req,
                                     decel,
                                     CS.das_3))
+
+    if (self.resume_pressed < 4 and self.torque > 0.1) and self.previous_counter != CS.button_counter:
+      can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
+      self.resume_pressed += 1
+      self.previous_counter = CS.button_counter
 
     # HUD alerts
     if self.frame % 25 == 0:
@@ -254,18 +259,3 @@ class CarController:
     new_actuators.steer = self.apply_steer_last / self.params.STEER_MAX
 
     return new_actuators, can_sends
-
-  def acc_brake(self, aTarget):
-    brake_target = aTarget
-    if self.last_brake is None:
-      self.last_brake = min(0., brake_target / 2)
-    else:
-      tBrake = brake_target
-      lBrake = self.last_brake
-      if tBrake < lBrake:
-        diff = min(BRAKE_CHANGE, (lBrake - tBrake) / 2)
-        self.last_brake = max(lBrake - diff, tBrake)
-      elif tBrake - lBrake > 0.01:  # don't let up unless it's a big enough jump
-        diff = min(BRAKE_CHANGE, (tBrake - lBrake) / 2)
-        self.last_brake = min(lBrake + diff, tBrake)
-    return self.last_brake
