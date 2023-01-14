@@ -38,9 +38,10 @@ class CarController:
     self.op_params = opParams()
     self.desired_velocity = 0
     self.calc_velocity = 0
-    self.last_standstill = 0
+    self.go_sent = 0
     self.resume_pressed = 0
     self.accel_req = 0
+    self.last_standstill = 0
 
   def update(self, CC, CS):
     can_sends = []
@@ -136,13 +137,14 @@ class CarController:
           self.last_standstill = 1
         else: 
           #stand_still = 0
-          self.last_standstill = 0
+          self.last_standstill = 1
         # keep the braking level of eVgo 1.0m/s until completely stopped, then max braking
         # if self.last_brake is not None and CS.out.vEgo > 0.001 and CS.out.vEgo < 1.0: 
         #   decel = max(decel, self.last_brake) 
           
         self.last_brake = decel
         self.resume_pressed = 0
+        self.go_sent = 0
 
       #Acclerating
       else:
@@ -171,13 +173,13 @@ class CarController:
         torque += CS.engineTorque if CS.engineTorque >0 else 0
 
         torque = max(torque, 0)#(0 - self.op_params.get('min_torque')))
-        self.accel_req = 1 #if self.last_standstill == 1 else 0
+        self.accel_req = 1 if self.go_sent < 5 else 0
         decel_req = 0
         decel = 4
         max_gear = 9
         #stand_still = 0
-        
-        #self.last_standstill = 0
+        self.last_standstill = 0
+        self.go_sent += 1 
 
         
       #Pacifica 
@@ -192,6 +194,7 @@ class CarController:
           torque = 0
           max_gear = 9
           decel = 0
+          self.go_sent = 0
           #stand_still = 0
         
 
@@ -240,7 +243,7 @@ class CarController:
           can_sends.append(create_chime_message(self.packer, 2))
 
         if CS.button_counter == 8:
-          if self.accel_req == 1 and self.resume_pressed < 2:
+          if (self.accel_req == 1 or self.go_sent == 1) and self.resume_pressed < 2:
             can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
             self.resume_pressed += 1
           else: can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons))
