@@ -76,8 +76,8 @@ class CarController:
             CS.button_pressed(ButtonType.resumeCruise):
           CS.longEnabled = True
           #forward the resume button press to the car
-          if CS.button_pressed(ButtonType.resumeCruise):
-            can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
+          # if CS.button_pressed(ButtonType.resumeCruise):
+          #   can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
     # steering
     if self.frame % 2 == 0:
       
@@ -166,9 +166,9 @@ class CarController:
         decel = 4
         max_gear = 9
         #stand_still = 0
-        if accel_req == 1 and self.frame % 14 == 0: 
+        if self.frame % 24 == 0 and self.resume_pressed < 2: 
           can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
-          #self.resume_pressed += 1 
+          self.resume_pressed += 1 
           
         #self.last_standstill = 0
 
