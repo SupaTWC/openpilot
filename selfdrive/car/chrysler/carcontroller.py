@@ -74,9 +74,9 @@ class CarController:
       if CS.longAvailable:
         if CS.button_pressed(ButtonType.cancel) or CS.out.brakePressed:
           CS.longEnabled = False
-        elif CS.button_pressed(ButtonType.accelCruise) or \
+        elif (CS.button_pressed(ButtonType.accelCruise) or \
             CS.button_pressed(ButtonType.decelCruise) or \
-            CS.button_pressed(ButtonType.resumeCruise):
+            CS.button_pressed(ButtonType.resumeCruise)) and CS.out.gearShifter == GearShifter.drive:
           CS.longEnabled = True
           self.resume_pressed = 0
           # #forward the resume button press to the car
