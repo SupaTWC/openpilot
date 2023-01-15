@@ -44,6 +44,7 @@ class CarController:
     self.last_standstill = 0
     self.reset = 1
     self.torque = 0
+    self.brake_prep_sent = 0
 
   def update(self, CC, CS):
     can_sends = []
@@ -81,7 +82,6 @@ class CarController:
             CS.button_pressed(ButtonType.decelCruise) or \
             CS.button_pressed(ButtonType.resumeCruise)) and CS.out.gearShifter == GearShifter.drive:
           CS.longEnabled = True
-          self.resume_pressed = 0
           # #forward the resume button press to the car
           # if CS.button_pressed(ButtonType.resumeCruise):
           #   can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
@@ -134,6 +134,7 @@ class CarController:
         self.torque = 0
         decel = self.acc_brake(self.accel)
         max_gear = 8
+        brake_prep = 1 if self.brake_prep_sent < 5 else 0
         if (decel < -1.95 and decel > -2.05 and CS.out.vEgo <=0.001):
           #stand_still = 1
           self.last_standstill = 1
@@ -143,6 +144,7 @@ class CarController:
         self.last_brake = decel
         self.resume_pressed = 0
         self.go_sent = 0
+        self.brake_prep_sent += 1
 
       #Acclerating
       else:
@@ -174,10 +176,12 @@ class CarController:
         self.accel_req = 1 if self.go_sent < 5 else 0
         decel_req = 0
         decel = 4
+        brake_prep = 0
         max_gear = 9
         #stand_still = 0
         self.last_standstill = 0
         self.go_sent += 1 
+        self.brake_prep_sent = 0
 
         
       #Pacifica 
@@ -192,8 +196,11 @@ class CarController:
           self.torque = 0
           max_gear = 9
           decel = 0
+          brake_prep = 0
           self.go_sent = 0
           self.resume_pressed = 0
+          self.brake_prep_sent = 0
+
           #stand_still = 0
         
 
@@ -207,7 +214,7 @@ class CarController:
                             max_gear,
                             decel_req,
                             decel,
-                            0, 1))
+                            0, brake_prep, 1))
         can_sends.append(acc_command(self.packer, self.frame / 2, 2,
                             CS.out.cruiseState.available,
                             CS.out.cruiseState.enabled,
@@ -216,7 +223,7 @@ class CarController:
                             max_gear,
                             decel_req,
                             decel,
-                            0, 1))
+                            0, brake_prep, 1))
 
         if self.frame % 2 == 0:
           can_sends.append(create_acc_1_message(self.packer, 0, self.frame / 2))

@@ -83,7 +83,7 @@ def create_cruise_buttons(packer, frame, bus, cruise_buttons, cancel=False, resu
     values = cruise_buttons.copy()
   return packer.make_can_msg("CRUISE_BUTTONS", bus, values)
 
-def acc_command(packer, counter, bus, available, enabled, accel_req=0, torque=0, max_gear=8, decel_req=0, decel=0, das_3=0, not_RAM = 0, stand_still = 0):
+def acc_command(packer, counter, bus, available, enabled, accel_req=0, torque=0, max_gear=8, decel_req=0, decel=0, das_3=0, brake_prep = 0, not_RAM = 0, stand_still = 0):
   if not_RAM == 1:
     values = {
     'ACC_AVAILABLE': available,
@@ -96,7 +96,8 @@ def acc_command(packer, counter, bus, available, enabled, accel_req=0, torque=0,
     'GR_MAX_REQ': 9 if max_gear is None else max_gear,
     'ACC_STANDSTILL': 0,#  stand_still,
     'ACC_GO': accel_req,
-    'DISABLE_FUEL_SHUTOFF': accel_req #mirror ACC_GO
+    'DISABLE_FUEL_SHUTOFF': accel_req, #mirror ACC_GO
+    'ACC_BRK_PREP': brake_prep,
   }
     
   else: 
