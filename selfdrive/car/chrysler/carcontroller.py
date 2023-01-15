@@ -255,10 +255,14 @@ class CarController:
                                     decel,
                                     CS.das_3))
     #resume button control, might work on RAM too?
-    if (self.resume_pressed < 4 and self.torque > 0.1) and self.previous_counter != CS.button_counter:
-      can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
+    if (self.resume_pressed < 5 and self.torque > 0.1) and self.previous_counter != CS.button_counter:
+      if self.resume_pressed < 4:
+        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
+      if self.resume_pressed < 5: #unpress resume button
+        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons))  
       self.resume_pressed += 1
       self.previous_counter = CS.button_counter
+    
 
     # HUD alerts
     if self.frame % 25 == 0:

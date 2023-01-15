@@ -61,6 +61,7 @@ class CarInterface(CarInterfaceBase):
       ret.vEgoStopping = 0.05
       #ret.startAccel = 1.0
       ret.pcmCruise = False #no stock set speed
+      ret.stopAccel = -1.0
 
     # Jeep
     elif candidate in (CAR.JEEP_CHEROKEE, CAR.JEEP_CHEROKEE_2019):
