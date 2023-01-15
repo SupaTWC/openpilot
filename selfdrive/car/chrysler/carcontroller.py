@@ -39,7 +39,7 @@ class CarController:
     self.last_standstill = 0
     self.resume_pressed = 0
     self.torque = 0
-    self.previous_counter = 100
+    self.reset = 1
 
   def update(self, CC, CS):
     can_sends = []
@@ -127,7 +127,7 @@ class CarController:
         accel_req = 0
         decel_req = 1
         self.torque = 0
-        decel = CC.actuators.accel # self.acc_brake(self.accel)
+        decel = self.acc_brake(self.accel)
         max_gear = 8
         if (decel < -1.95 and decel > -2.05 and CS.out.vEgo <=0.001):
           #stand_still = 1
@@ -187,7 +187,7 @@ class CarController:
           decel = 0
           #stand_still = 0
           self.resume_pressed = 0
-        can_sends.append(acc_log(self.packer, CC.actuators.accel, CC.actuators.speed, self.calc_velocity, CS.out.aEgo, CS.out.vEgo))
+        can_sends.append(acc_log(self.packer, CC.actuators.accel, self.torque, self.calc_velocity, CS.out.aEgo, CS.out.vEgo))
         can_sends.append(acc_command(self.packer, self.frame / 2, 0,
                             CS.out.cruiseState.available,
                             CS.out.cruiseState.enabled,
@@ -242,10 +242,14 @@ class CarController:
                                     decel,
                                     CS.das_3))
 
-    if (self.resume_pressed < 4 and self.torque > 0.1) and self.previous_counter != CS.button_counter:
-      can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
-      self.resume_pressed += 1
-      self.previous_counter = CS.button_counter
+    if CS.cruise_buttons % 4 == 0:
+      if (self.accel_req == 1 or self.go_sent == 1) and self.resume_pressed == 0:
+        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
+        self.reset = 0
+        self.resume_pressed = 1
+      if self.reset == 0:
+        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
+        self.reset = 1
 
     # HUD alerts
     if self.frame % 25 == 0:
