@@ -96,6 +96,7 @@ def acc_command(packer, counter, bus, available, enabled, accel_req=0, torque=0,
     'GR_MAX_REQ': 9 if max_gear is None else max_gear,
     'ACC_STANDSTILL': 0,#  stand_still,
     'ACC_GO': accel_req,
+    'DISABLE_FUEL_SHUTOFF': accel_req #mirror ACC_GO
   }
     
   else: 

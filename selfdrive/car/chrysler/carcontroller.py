@@ -42,7 +42,7 @@ class CarController:
     self.resume_pressed = 0
     self.accel_req = 0
     self.last_standstill = 0
-    self.previous_counter = 100
+    self.reset = 1
     self.torque = 0
 
   def update(self, CC, CS):
@@ -132,7 +132,7 @@ class CarController:
         self.accel_req = 0
         decel_req = 1
         self.torque = 0
-        decel = CC.actuators.accel # self.acc_brake(self.accel)
+        decel = self.acc_brake(self.accel)
         max_gear = 8
         if (decel < -1.95 and decel > -2.05 and CS.out.vEgo <=0.001):
           #stand_still = 1
@@ -255,14 +255,17 @@ class CarController:
                                     decel,
                                     CS.das_3))
     #resume button control, might work on RAM too?
-    if (self.resume_pressed < 5 and self.torque > 0.1) and self.previous_counter != CS.button_counter:
-      if self.resume_pressed < 4:
+    if CS.cruise_buttons % 4 == 0:
+      if (self.accel_req == 1 or self.go_sent == 1) and self.resume_pressed == 0:
+      #self.target_resume = (CS.button_counter + 5)%16 
         can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
-      if self.resume_pressed < 5: #unpress resume button
-        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons))  
-      self.resume_pressed += 1
-      self.previous_counter = CS.button_counter
+        self.reset = 0
+        self.resume_pressed = 1
+      if self.reset == 0:
+        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
+        self.reset = 1
     
+
 
     # HUD alerts
     if self.frame % 25 == 0:
