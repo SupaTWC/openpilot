@@ -261,7 +261,7 @@ class CarController:
                                     decel,
                                     CS.das_3))
     #resume button control, might work on RAM too?
-    if CS.cruise_buttons % 4 == 0:
+    if CS.button_counter % 4 == 0:
       if (self.accel_req == 1 or self.go_sent == 1) and self.resume_pressed == 0:
       #self.target_resume = (CS.button_counter + 5)%16 
         can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
