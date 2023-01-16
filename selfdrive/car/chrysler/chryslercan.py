@@ -121,7 +121,7 @@ def create_das_4_message(packer, bus, state, speed):
     "ACC_DISTANCE_CONFIG_1": 0x1,
     "ACC_DISTANCE_CONFIG_2": 0x1,
     "SPEED_DIGITAL": 0xFE,
-    "FCW_BRAKE_ENABLED": 0,
+    "FCW_BRAKE_ENABLED": 1,
     "ACC_STATE": state,
     "ACC_SET_SPEED_KPH": round(speed * CV.MS_TO_KPH),
     "ACC_SET_SPEED_MPH": round(speed * CV.MS_TO_MPH),
