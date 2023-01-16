@@ -115,13 +115,6 @@ def acc_command(packer, counter, bus, available, enabled, accel_req=0, torque=0,
     values['GR_MAX_REQ'] = max_gear
 
   return packer.make_can_msg("DAS_3", bus, values)
-def create_acc_1_message(packer, bus, frame):
-  values = {
-    "ACCEL_PERHAPS": 32767,
-    "COUNTER": frame % 0x10,
-  }
-
-  return packer.make_can_msg("ACC_1", bus, values)
 
 def create_das_4_message(packer, bus, state, speed):
   values = {
@@ -135,6 +128,18 @@ def create_das_4_message(packer, bus, state, speed):
   }
 
   return packer.make_can_msg("DAS_4", bus, values) 
+
+def create_das_5_message(packer, bus, frame, speed):
+  values = {
+    "FCW_STATE": 1,
+    "FCW_DISTANCE": 2,
+    "SET_SPEED_KPH": round(speed * CV.MS_TO_KPH),
+    "WHEEL_TORQUE_REQUEST": 25000,
+    "WHEEL_TORQUE_REQUEST_ACTIVE": 0,
+    "COUNTER": frame % 0x10,
+  }
+
+  return packer.make_can_msg("DAS_5", bus, values) 
 
 def create_chime_message(packer, bus):
   values = { # 1000ms

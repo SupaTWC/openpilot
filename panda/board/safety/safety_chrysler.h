@@ -42,7 +42,7 @@ typedef struct {
   const int CENTER_STACK_2;
   const int TESTER;
   const int DAS_4;
-  const int ACC_1;
+  const int DAS_5;
   const int CHIME;
 } ChryslerAddrs;
 
@@ -61,7 +61,7 @@ const ChryslerAddrs CHRYSLER_ADDRS = {
   .TESTER           = 0x753,  // Tester codes
   .DAS_3            = 500,  // ACC commands
   .DAS_4            = 501,  // ACC engagement states from DASM
-  .ACC_1            = 625,  // ACC set speed
+  .DAS_5            = 625,  // FCW
   .CHIME            = 838, // Chime control
 };
 
@@ -103,8 +103,8 @@ const CanMsg CHRYSLER_TX_MSGS[] = {
   {CHRYSLER_ADDRS.DAS_3, 2, 8},
   {CHRYSLER_ADDRS.DAS_4, 0, 8},
   {CHRYSLER_ADDRS.DAS_4, 2, 8},
-  {CHRYSLER_ADDRS.ACC_1, 0, 8},
-  {CHRYSLER_ADDRS.ACC_1, 2, 8},
+  {CHRYSLER_ADDRS.DAS_5, 0, 8},
+  {CHRYSLER_ADDRS.DAS_5, 2, 8},
   {CHRYSLER_ADDRS.CHIME, 0, 2},
   {CHRYSLER_ADDRS.CHIME, 2, 2},
 

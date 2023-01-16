@@ -1,7 +1,7 @@
 from opendbc.can.packer import CANPacker
 from common.realtime import DT_CTRL
 from selfdrive.car import apply_toyota_steer_torque_limits
-from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, create_cruise_buttons, acc_command, create_acc_1_message, create_das_4_message, create_chime_message, acc_log#, create_lkas_heartbit
+from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, create_cruise_buttons, acc_command, create_das_4_message, create_das_5_message, create_chime_message, acc_log#, create_lkas_heartbit
 from selfdrive.car.chrysler.values import CAR, RAM_CARS, RAM_DT, RAM_HD, CarControllerParams
 from cereal import car
 from common.numpy_fast import clip
@@ -226,9 +226,8 @@ class CarController:
                             0, brake_prep, 1))
 
         if self.frame % 2 == 0:
-          can_sends.append(create_acc_1_message(self.packer, 0, self.frame / 2))
-          can_sends.append(create_acc_1_message(self.packer, 2, self.frame / 2))
-
+          can_sends.append(create_das_5_message(self.packer, 0, self.frame / 2, CC.hudControl.setSpeed))
+          can_sends.append(create_das_5_message(self.packer, 2, self.frame / 2, CC.hudControl.setSpeed))
         # if self.frame % 10 == 0:
         #   new_msg = create_lkas_heartbit(self.packer, 0, CS.lkasHeartbit)
         #   can_sends.append(new_msg)
@@ -237,7 +236,7 @@ class CarController:
           state = 0
           if CS.out.cruiseState.available:
             state = 2 if CS.out.cruiseState.enabled else 1 #1/2 for regular cc, 3/4 for ACC
-          can_sends.append(create_das_4_message(self.packer, 0, state, CC.hudControl.setSpeed)) #need to double check setSpeed
+          can_sends.append(create_das_4_message(self.packer, 0, state, CC.hudControl.setSpeed)) 
           can_sends.append(create_das_4_message(self.packer, 2, state, CC.hudControl.setSpeed))
 
         if self.frame % 50 == 0:
