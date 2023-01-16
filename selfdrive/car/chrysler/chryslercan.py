@@ -131,7 +131,7 @@ def create_das_4_message(packer, bus, state, speed):
 
 def create_das_5_message(packer, bus, frame, speed):
   values = {
-    "FCW_STATE": 1,
+    "FCW_STATE": 0,
     "FCW_DISTANCE": 2,
     "SET_SPEED_KPH": round(speed * CV.MS_TO_KPH),
     "WHEEL_TORQUE_REQUEST": 25000,
