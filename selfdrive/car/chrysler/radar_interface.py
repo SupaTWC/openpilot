@@ -11,7 +11,7 @@ NUMBER_MSGS = len(RADAR_MSGS_C) + len(RADAR_MSGS_D)
 
 def _create_radar_can_parser(car_fingerprint):
   dbc = DBC[car_fingerprint]['radar']
-  if dbc is None:
+  if dbc is not None:
     return None
 
   msg_n = len(RADAR_MSGS_C)

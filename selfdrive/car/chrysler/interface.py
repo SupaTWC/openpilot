@@ -47,6 +47,7 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.15, 0.30], [0.03, 0.05]]
       ret.lateralTuning.pid.kf = 0.00006
       ret.openpilotLongitudinalControl = True
+      ret.experimentalLongitudinalAvailable = True
       tune = ret.longitudinalTuning
       tune.deadzoneBP = [0., 9.]
       tune.deadzoneV = [.0, .15]
