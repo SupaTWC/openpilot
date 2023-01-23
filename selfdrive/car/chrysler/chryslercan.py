@@ -105,7 +105,7 @@ def das_4_message(packer, stock_ACC, bus, state, speed, das_4):
       "ACC_DISTANCE_CONFIG_1": 0x1,
       "ACC_DISTANCE_CONFIG_2": 0x1,
       "SPEED_DIGITAL": 0xFE,
-      "FCW_BRAKE_ENABLED": 0x1,
+      #"FCW_BRAKE_ENABLED": 0x1,
       "ACC_STATE": state,
       "ACC_SET_SPEED_KPH": round(speed * CV.MS_TO_KPH),
       "ACC_SET_SPEED_MPH": round(speed * CV.MS_TO_MPH),
@@ -119,7 +119,7 @@ def das_4_message(packer, stock_ACC, bus, state, speed, das_4):
 def das_5_message(packer, stock_ACC, bus, speed, das_5):
   if not stock_ACC:
     values = {
-      "FCW_STATE": 0x1,
+      #"FCW_STATE": 0x1,
       "FCW_DISTANCE": 0x2,
       "SET_SPEED_KPH": round(speed * CV.MS_TO_KPH),
       "COUNTER1": 0x0,
@@ -130,6 +130,13 @@ def das_5_message(packer, stock_ACC, bus, speed, das_5):
     values = das_5.copy()
 
   return packer.make_can_msg("DAS_5", bus, values)
+def create_chime_message(packer, bus):
+  values = { # 1000ms
+    # "CHIME": chime if (chime_timer > 0 and (gap_timer == 0 or gap_timer == chimegap_time)) else 14,
+    # "CHIME_REQ_L": 1 if (chime_timer > 0 and (gap_timer == 0 or gap_timer == chimegap_time)) else 0,
+    # "CHIME_REQ_R": 1 if (chime_timer > 0 and (gap_timer == 0 or gap_timer == chimegap_time)) else 0
+  }
+  return packer.make_can_msg("CHIME", bus, values)
 
 def acc_log(packer, aTarget, vTarget, calcvTarget, aActual, vActual):
   values = {

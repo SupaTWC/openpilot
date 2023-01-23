@@ -33,6 +33,9 @@ class CarState(CarStateBase):
       self.shifter_values = can_define.dv["Transmission_Status"]["Gear_State"]
     else:
       self.shifter_values = can_define.dv["GEAR"]["PRNDL"]
+      self.longAvailable = False
+      self.longEnabled = False
+      self.allowLong = True
 
   def create_button_events(self, cp, buttons):
     button_events = []
@@ -118,20 +121,26 @@ class CarState(CarStateBase):
     ret.cruiseState.nonAdaptive = False
     ret.cruiseState.standstill = ret.standstill
     # ret.accFaulted = cp_cruise.vl["DAS_3"]["ACC_FAULTED"] != 0
-    if self.op_params.get('stock_ACC'):
-      ret.cruiseState.available = cp_cruise.vl["DAS_3"]["ACC_AVAILABLE"] == 1
-      ret.cruiseState.enabled = cp_cruise.vl["DAS_3"]["ACC_ACTIVE"] == 1
-      ret.cruiseState.speed = cp_cruise.vl["DAS_4"]["ACC_SET_SPEED_KPH"] * CV.KPH_TO_MS
-      ret.cruiseState.nonAdaptive = cp_cruise.vl["DAS_4"]["ACC_STATE"] in (1, 2)  # 1 NormalCCOn and 2 NormalCCSet
+    if self.CP.carFingerprint in RAM_CARS:
+      if self.op_params.get('stock_ACC'):
+        ret.cruiseState.available = cp_cruise.vl["DAS_3"]["ACC_AVAILABLE"] == 1
+        ret.cruiseState.enabled = cp_cruise.vl["DAS_3"]["ACC_ACTIVE"] == 1
+        ret.cruiseState.speed = cp_cruise.vl["DAS_4"]["ACC_SET_SPEED_KPH"] * CV.KPH_TO_MS
+        ret.cruiseState.nonAdaptive = cp_cruise.vl["DAS_4"]["ACC_STATE"] in (1, 2)  # 1 NormalCCOn and 2 NormalCCSet
 
-    self.das_3 = cp_cruise.vl['DAS_3']
-    self.das_4 = cp_cruise.vl['DAS_4']
-    self.das_5 = cp_cruise.vl['DAS_5']
-    self.torqMin = cp_cruise.vl["DAS_3"]["ENGINE_TORQUE_REQUEST"]
-    self.maxgear = cp_cruise.vl["DAS_3"]["GR_MAX_REQ"]
+      self.das_3 = cp_cruise.vl['DAS_3']
+      self.das_4 = cp_cruise.vl['DAS_4']
+      self.das_5 = cp_cruise.vl['DAS_5']
+      self.torqMin = cp_cruise.vl["DAS_3"]["ENGINE_TORQUE_REQUEST"]
+      self.maxgear = cp_cruise.vl["DAS_3"]["GR_MAX_REQ"]
+
+    else: #Pacifica op long
+      ret.accFaulted = False
+      self.torqMin = cp.vl["ECM_TRQ"]["ENGINE_TORQ_MIN"]
+      self.currentGear = cp.vl['TCM_A7']["CurrentGear"]
+      self.maxgear = 9
 
 
-    
     self.torqMax = cp.vl["ECM_TRQ"]["ENGINE_TORQ_MAX"]
     self.engineRpm = cp.vl["ECM_1"]["ENGINE_RPM"]
     self.engineTorque = cp.vl["ECM_1"]["ENGINE_TORQUE"]
@@ -150,6 +159,12 @@ class CarState(CarStateBase):
       self.lkasbuttonprev = self.lkasbutton
     else:
       ret.steerFaultPermanent = cp.vl["EPS_2"]["LKAS_STATE"] == 4
+      self.lkasbutton = (cp.vl["TRACTION_BUTTON"]["TOGGLE_LKAS"] == 1)
+      if self.lkasbutton ==1 and self.lkasdisabled== 0 and self.lkasbuttonprev == 0:
+        self.lkasdisabled = 1
+      elif self.lkasbutton ==1 and self.lkasdisabled == 1 and self.lkasbuttonprev == 0:
+        self.lkasdisabled = 0
+      self.lkasbuttonprev = self.lkasbutton
 
     # blindspot sensors
     if self.CP.enableBsm:
@@ -297,13 +312,19 @@ class CarState(CarStateBase):
         ("PRNDL", "GEAR"),
         ("SPEED_LEFT", "SPEED_1"),
         ("SPEED_RIGHT", "SPEED_1"),
+        ("TOGGLE_LKAS", "TRACTION_BUTTON"),
+        ("INPUT_SPEED", "TRANS_SPEED"),
+        ("TC_LOCKED", "TRANS_SPEED"),
       ]
       checks += [
         ("GEAR", 50),
         ("SPEED_1", 100),
+        ("TRACTION_BUTTON", 1),
+        ("TRANS_SPEED", 50),
       ]
-      signals += CarState.get_cruise_signals()[0]
-      checks += CarState.get_cruise_signals()[1]
+      if 1 == 2: #if NOT oplong
+        signals += CarState.get_cruise_signals()[0]
+        checks += CarState.get_cruise_signals()[1]
 
     return CANParser(DBC[CP.carFingerprint]["pt"], signals, checks, 0)
 
