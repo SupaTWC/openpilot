@@ -52,9 +52,9 @@ class CarInterface(CarInterfaceBase):
       tune.kpV = [0.25]
       tune.kiV = [0.05]
       ret.stopAccel = -2.0
-      ret.startingState = True
+      #ret.startingState = True
       ret.vEgoStarting = 0.1
-      ret.startAccel = 1.0
+      #ret.startAccel = 1.0
       ret.vEgoStopping = 0.05
 
     # Jeep
