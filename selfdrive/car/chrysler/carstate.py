@@ -23,7 +23,7 @@ class CarState(CarStateBase):
     self.torqMin = None
     self.torqMax = None
     self.longEnabled = False
-    self.longAvailable = False
+    self.longAvailable = True #fix later
     self.cruisespeed = 0
 
     if CP.carFingerprint in RAM_CARS:

@@ -137,7 +137,7 @@ AddrCheckStruct chrysler_addr_checks[] = {
   //{.msg = {{ESP_8, 0, 8, .check_checksum = true, .max_counter = 15U, .expected_timestep = 20000U}}},
   {.msg = {{514, 0, 8, .check_checksum = false, .max_counter = 0U, .expected_timestep = 10000U}, { 0 }, { 0 }}},
   {.msg = {{CHRYSLER_ADDRS.ECM_5, 0, 8, .check_checksum = true, .max_counter = 15U, .expected_timestep = 20000U}, { 0 }, { 0 }}},
-  {.msg = {{CHRYSLER_ADDRS.DAS_3, 0, 8, .check_checksum = true, .max_counter = 15U, .expected_timestep = 20000U}, { 0 }, { 0 }}},
+  //{.msg = {{CHRYSLER_ADDRS.DAS_3, 0, 8, .check_checksum = true, .max_counter = 15U, .expected_timestep = 20000U}, { 0 }, { 0 }}},
 };
 #define CHRYSLER_ADDR_CHECK_LEN (sizeof(chrysler_addr_checks) / sizeof(chrysler_addr_checks[0]))
 
@@ -295,11 +295,11 @@ static int chrysler_tx_hook(CANPacket_t *to_send, bool longitudinal_allowed) {
     tx = msg_allowed(to_send, CHRYSLER_TX_MSGS, sizeof(CHRYSLER_TX_MSGS) / sizeof(CHRYSLER_TX_MSGS[0]));
   }
 
-  // // ACC for ECU disable
-  // if (tx && (addr == chrysler_addrs->DAS_3)) {
-  //   bool cruise_engaged = GET_BIT(to_send, 21U) == 1U;
-  //   pcm_cruise_check(cruise_engaged);
-  // }
+  // ACC for ECU disable
+  if (tx && (addr == chrysler_addrs->DAS_3)) {
+    bool cruise_engaged = GET_BIT(to_send, 21U) == 1U;
+    pcm_cruise_check(cruise_engaged);
+  }
 
   // STEERING
   if (tx && (addr == chrysler_addrs->LKAS_COMMAND)) {
