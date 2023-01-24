@@ -40,8 +40,8 @@ class CarController:
     self.desired_velocity = 0
     self.calc_velocity = 0
     self.speed = 0
-    self.long_active = False
-    self.last_acc = False
+    #self.long_active = False
+    #self.last_acc = False
 
   def update(self, CC, CS):
     can_sends = []
@@ -115,7 +115,7 @@ class CarController:
       stopping = CC.actuators.longControlState == LongCtrlState.stopping
       starting = CC.actuators.longControlState == LongCtrlState.starting
       self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
-      self.long_active = CC.enabled
+      #self.long_active = CS.out.cruiseState.enabled
       self.speed = CC.hudControl.setSpeed
 
       brake_threshold = -self.op_params.get('brake_threshold') if CS.out.vEgo > 2.25 else 0
@@ -129,18 +129,19 @@ class CarController:
       accel_req = False
       standstill = False
       decel = 4
-      torque = -75
-      max_gear = 8
+      torque = -75 #is it a good idea to request negative 75 when not engaged then jump to a positive number when enabling long?
+      max_gear = 8 if self.CP.carFingerprint in RAM_CARS else 9 #9 for Pacifica, Check RAM
         
-      if self.last_acc != CC.enabled:
-        self.long_active = True
+      # if self.last_acc != CC.enabled:
+      #   self.long_active = True
 
-      elif CC.enabled:
+      if CS.out.cruiseState.enabled:
         if CC.actuators.accel < brake_threshold:
           decel_req = True
           # if CC.actuators.speed < 0.1 and CS.out.vEgo < 0.1:
           if stopping and CS.out.vEgo < 0.01:
             standstill = True
+            max_gear = 2
           decel = CC.actuators.accel
 
         else:
@@ -148,12 +149,13 @@ class CarController:
           # if CS.out.vEgo < 0.1 and CC.actuators.accel > 0:
           if starting:
             accel_go = True
-
+          if CS.out.vEgo < 4:
+            max_gear = 2
           self.calc_velocity = ((self.accel-CS.out.aEgo) * time_for_sample) + CS.out.vEgo
           if self.op_params.get('comma_speed'):
-            self.desired_velocity = min(CC.actuators.speed, CS.out.cruiseState.speed)
+            self.desired_velocity = min(CC.actuators.speed, self.speed)
           else:
-            self.desired_velocity = min(self.calc_velocity, CS.out.cruiseState.speed)
+            self.desired_velocity = min(self.calc_velocity, self.speed)
 
           # kinetic energy (J) = 1/2 * mass (kg) * velocity (m/s)^2
           # use the kinetic energy from the desired velocity - the kinetic energy from the current velocity to get the change in velocity
@@ -179,9 +181,10 @@ class CarController:
 
         torque = max(torque, (0 - self.op_params.get('min_torque')))
       
-      self.last_acc = CC.enabled
+      #self.last_acc = CC.enabled
 
-      can_sends.append(das_3_message(self.packer, das_3_counter, self.long_active,
+      can_sends.append(das_3_message(self.packer, das_3_counter, CS.out.cruiseState.enabled,
+                                    CS.out.cruiseState.available,
                                     accel_req, 
                                     decel_req,
                                     accel_go,

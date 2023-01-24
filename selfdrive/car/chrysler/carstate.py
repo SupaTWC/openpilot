@@ -23,6 +23,7 @@ class CarState(CarStateBase):
     self.torqMin = None
     self.torqMax = None
     self.longEnabled = False
+    self.longAvailable = False
     self.cruisespeed = 0
 
     if CP.carFingerprint in RAM_CARS:
@@ -86,18 +87,22 @@ class CarState(CarStateBase):
     ret.genericToggle = cp.vl["STEERING_LEVERS"]["HIGH_BEAM_PRESSED"] == 1
     
     # if accelcruise pressed set self.longEnabled to True
-    ret.cruiseState.speed = self.cruisespeed
-    if cp.vl["CRUISE_BUTTONS"]["ACC_Accel"] == 1 or cp.vl["CRUISE_BUTTONS"]["ACC_Decel"] == 1 or cp.vl["CRUISE_BUTTONS"]["ACC_Resume"] == 1:
-      self.longEnabled = True
-      # if ret.cruiseState.speed == 0 or ret.cruiseState.speed > 45:
-      #   ret.cruiseState.speed = ret.vEgo if ret.vEgo > 20 * CV.MPH_TO_MS else 20 * CV.MPH_TO_MS
-      # elif cp.vl["CRUISE_BUTTONS"]["ACC_Accel"] == 1:
-      #   ret.cruiseState.speed += 1
-    
-    elif cp.vl["CRUISE_BUTTONS"]["ACC_Cancel"] == 1 or ret.brakePressed == 1:
+    #ret.cruiseState.speed = self.cruisespeed
+    if cp.vl["CRUISE_BUTTONS"]["ACC_OnOff"] == 1:
+      self.longAvailable = not self.longAvailable
       self.longEnabled = False
-      # if cp.vl["CRUISE_BUTTONS"]["ACC_Cancel"] == 1:
-      #   ret.cruiseState.speed = 0
+    if self.longAvailable:
+      if cp.vl["CRUISE_BUTTONS"]["ACC_Accel"] == 1 or cp.vl["CRUISE_BUTTONS"]["ACC_Decel"] == 1 or cp.vl["CRUISE_BUTTONS"]["ACC_Resume"] == 1:
+        self.longEnabled = True
+        # if ret.cruiseState.speed == 0 or ret.cruiseState.speed > 45:
+        #   ret.cruiseState.speed = ret.vEgo if ret.vEgo > 20 * CV.MPH_TO_MS else 20 * CV.MPH_TO_MS
+        # elif cp.vl["CRUISE_BUTTONS"]["ACC_Accel"] == 1:
+        #   ret.cruiseState.speed += 1
+      
+      elif cp.vl["CRUISE_BUTTONS"]["ACC_Cancel"] == 1 or ret.brakePressed == 1:
+        self.longEnabled = False
+        # if cp.vl["CRUISE_BUTTONS"]["ACC_Cancel"] == 1:
+        #   ret.cruiseState.speed = 0
 
     # steering wheel
     ret.steeringAngleDeg = cp.vl["STEERING"]["STEERING_ANGLE"] + cp.vl["STEERING"]["STEERING_ANGLE_HP"]
@@ -110,7 +115,7 @@ class CarState(CarStateBase):
     cp_cruise = cp_cam if self.CP.carFingerprint in RAM_CARS else cp
 
     ret.cruiseState.enabled = self.longEnabled
-    ret.cruiseState.available = True
+    ret.cruiseState.available = self.longAvailable
     ret.cruiseState.nonAdaptive = False
     ret.cruiseState.standstill = ret.standstill
     # ret.accFaulted = cp_cruise.vl["DAS_3"]["ACC_FAULTED"] != 0
@@ -153,7 +158,7 @@ class CarState(CarStateBase):
     self.cruise_buttons = cp.vl["CRUISE_BUTTONS"]
 
     ret.buttonEvents = self.create_button_events(cp, self.CCP.BUTTONS)
-    self.cruisespeed = ret.cruiseState.speed
+    #self.cruisespeed = ret.cruiseState.speed
 
     return ret
 
