@@ -42,12 +42,14 @@ class CarController:
     self.speed = 0
     self.long_active = False
     self.last_acc = False
+    self.last_brake = None
 
   def update(self, CC, CS):
     can_sends = []
 
     lkas_active = CC.latActive and not CS.lkasdisabled
-
+    if not CC.enabled:
+      self.last_brake = None
     # cruise buttons
     if (CS.button_counter != self.last_button_frame):
       das_bus = 2 if self.CP.carFingerprint in RAM_CARS else 0
@@ -129,8 +131,9 @@ class CarController:
       accel_req = False
       standstill = False
       decel = 4
-      torque = -75
+      torque = -2
       max_gear = 8
+      
         
       if self.last_acc != CC.enabled:
         self.long_active = True
@@ -141,9 +144,10 @@ class CarController:
           # if CC.actuators.speed < 0.1 and CS.out.vEgo < 0.1:
           if stopping and CS.out.vEgo < 0.01:
             standstill = True
-          decel = CC.actuators.accel
+          decel = self.acc_brake(CC.actuators.accel) #CC.actuators.accel
 
         else:
+          self.last_brake = None
           accel_req = True
           # if CS.out.vEgo < 0.1 and CC.actuators.accel > 0:
           if starting:
@@ -222,3 +226,17 @@ class CarController:
     new_actuators.steer = self.apply_steer_last / self.params.STEER_MAX
 
     return new_actuators, can_sends
+  def acc_brake(self, aTarget):
+      brake_target = aTarget
+      if self.last_brake is None:
+        self.last_brake = min(0., brake_target / 2)
+      else:
+        tBrake = brake_target
+        lBrake = self.last_brake
+        if tBrake < lBrake:
+          diff = min(BRAKE_CHANGE, (lBrake - tBrake) / 2)
+          self.last_brake = max(lBrake - diff, tBrake)
+        elif tBrake - lBrake > 0.01:  # don't let up unless it's a big enough jump
+          diff = min(BRAKE_CHANGE, (tBrake - lBrake) / 2)
+          self.last_brake = min(lBrake + diff, tBrake)
+      return self.last_brake
