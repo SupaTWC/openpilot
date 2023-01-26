@@ -36,7 +36,8 @@ class CarController:
 
     # long
     self.last_brake = None
-    self.max_gear = None
+    self.go_sent = 0
+    self.max_gear = 9
     self.op_params = opParams()
 
   def update(self, CC, CS):
@@ -114,6 +115,7 @@ class CarController:
 
       if not CC.enabled:
         self.last_brake = None
+        self.go_sent = 0
 
       max_gear = 8
 
@@ -123,16 +125,20 @@ class CarController:
         accel_req = False
         decel_req = False
         torque = None
-        decel = self.acc_brake(self.accel)
+        decel = self.accel
         max_gear = 8
+        self.go_sent = 0
+        
 
       else:
-        time_for_sample = self.op_params.get('long_time_constant')
-        torque_limits = self.op_params.get('torque_limits')
-        drivetrain_efficiency = self.op_params.get('drivetrain_efficiency')
+        time_for_sample = 1
+        torque_limits = 50
+        drivetrain_efficiency = 0.85
         self.last_brake = None
-        accel_req = True
+        accel_req = 1 if self.go_sent < 10 else 0
+        self.go_sent += 0
         decel_req = False
+        
         # delta_accel = CC.actuators.accel - CS.out.aEgo
 
         # distance_moved = ((delta_accel * time_for_sample**2)/2) + (CS.out.vEgo * time_for_sample)
@@ -162,13 +168,14 @@ class CarController:
           # rough estimate of external forces in N
           total_forces = 650
           #torque required to maintain speed
-          torque = (total_forces * CS.out.vEgo * 9.55414)/(CS.engineRpm * drivetrain_efficiency + 0.001)
+          torque = 40
 
         #If torque is positive, add the engine torque to the torque we calculated. This is because the engine torque is the torque the engine is producing.
         else:
           torque += CS.engineTorque
 
         decel = None
+        
         
       #ECU Disabled
       if self.CP.carFingerprint not in RAM_CARS:
@@ -183,6 +190,7 @@ class CarController:
           torque = None
           self.max_gear = 9
           decel = None
+          self.go_sent = 0
 
           can_sends.append(acc_command(self.packer, self.frame / 2, 0,
                              CS.out.cruiseState.available,

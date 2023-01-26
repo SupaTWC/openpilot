@@ -46,6 +46,8 @@ class VCruiseHelper:
 
   @property
   def v_cruise_initialized(self):
+    if self.CP.carName == "chrysler":
+      return True
     return self.v_cruise_kph != V_CRUISE_INITIAL
 
   def update_v_cruise(self, CS, enabled, is_metric):
