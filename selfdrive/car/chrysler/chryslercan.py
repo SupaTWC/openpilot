@@ -78,7 +78,7 @@ def create_cruise_buttons(packer, frame, bus, cruise_buttons, cancel=False, resu
     values = cruise_buttons.copy()
   return packer.make_can_msg("CRUISE_BUTTONS", bus, values)
 
-def das_3_message(packer, counter, enabled, available, accel_req, decel_req, accel_go, torque, max_gear, standstill, decel):
+def das_3_message(packer, counter, enabled, available, accel_req, decel_req, accel_go, torque, max_gear, standstill, decel, bus = 0):
   values = {
     'ACC_AVAILABLE': available,
     'ACC_ACTIVE': enabled,
@@ -92,7 +92,7 @@ def das_3_message(packer, counter, enabled, available, accel_req, decel_req, acc
     'ACC_GO': accel_go,
   }
 
-  return packer.make_can_msg("DAS_3", 0, values)
+  return packer.make_can_msg("DAS_3", bus, values)
 
 def das_4_message(packer, bus, state, speed):
   values = {
@@ -106,15 +106,12 @@ def das_4_message(packer, bus, state, speed):
   }
 
   return packer.make_can_msg("DAS_4", bus, values) 
+  
 
 def das_5_message(packer, CP, bus, speed, frame):
   values = {
     "FCW_STATE": 0,
-<<<<<<< HEAD
-    #"FCW_DISTANCE": 0x2,
-=======
     "FCW_DISTANCE": 0,
->>>>>>> e6d6276f681f7988f8f741a31bc1962c62254c6c
     # "SET_SPEED_KPH": round(speed * CV.MS_TO_KPH),
     "WHEEL_TORQUE_REQUEST": 25000,
   }
