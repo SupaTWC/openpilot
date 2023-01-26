@@ -17,7 +17,6 @@ class CarInterface(CarInterfaceBase):
   @staticmethod
   def get_params(candidate, fingerprint=gen_empty_fingerprint(), car_fw=None, experimental_long=False):
     ret = CarInterfaceBase.get_std_params(candidate, fingerprint)
-    ret.carName = "chrysler"
 
     ret.radarOffCan = DBC[candidate]['radar'] is None
 
@@ -32,7 +31,7 @@ class CarInterface(CarInterfaceBase):
     elif candidate in RAM_DT:
       ret.safetyConfigs[0].safetyParam |= Panda.FLAG_CHRYSLER_RAM_DT
 
-    ret.minSteerSpeed = 0  # m/s
+    ret.minSteerSpeed = -0.1  # m/s
     if candidate in (CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020, CAR.JEEP_CHEROKEE_2019):
       # TODO: allow 2019 cars to steer down to 13 m/s if already engaged.
       ret.minSteerSpeed = 17.5  # m/s 17 on the way up, 13 on the way down once engaged.
@@ -51,14 +50,16 @@ class CarInterface(CarInterfaceBase):
       tune.deadzoneV = [0]#[.0, .15]
       tune.kpV = [2.5]
       tune.kiV = [0.0]
-      #ret.longitudinalActuatorDelayLowerBound = 0.5
-      ret.longitudinalActuatorDelayUpperBound = 0.5 # s
+      ret.longitudinalActuatorDelayLowerBound = 0.5
+      ret.longitudinalActuatorDelayUpperBound = 0.6 # s
       ret.stoppingDecelRate = 0.3 
       #ret.stoppingControl = True
       ret.startingState = True
       ret.vEgoStarting = 0.1 #default 0.5, hyundai 0.1
       ret.startAccel = 8.0
+      ret.vEgoStopping = 0.05
       ret.pcmCruise = False #no stock set speed
+      ret.carName = "chrysler"
 
     # Jeep
     elif candidate in (CAR.JEEP_CHEROKEE, CAR.JEEP_CHEROKEE_2019):
@@ -70,6 +71,19 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.pid.kpBP, ret.lateralTuning.pid.kiBP = [[9., 20.], [9., 20.]]
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.15, 0.30], [0.03, 0.05]]
       ret.lateralTuning.pid.kf = 0.00006
+      tune.deadzoneBP = [0]#[0., 9.]
+      tune.deadzoneV = [0]#[.0, .15]
+      tune.kpV = [2.5]
+      tune.kiV = [0.0]
+      #ret.longitudinalActuatorDelayLowerBound = 0.5
+      ret.longitudinalActuatorDelayUpperBound = 0.5 # s
+      ret.stoppingDecelRate = 0.3 
+      #ret.stoppingControl = True
+      ret.startingState = True
+      ret.vEgoStarting = 0.1 #default 0.5, hyundai 0.1
+      ret.startAccel = 8.0
+      ret.vEgoStopping = 0.05
+      ret.pcmCruise = False #no stock set speed
 
     # Ram
     elif candidate == CAR.RAM_1500:
