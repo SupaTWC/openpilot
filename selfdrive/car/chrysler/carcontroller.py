@@ -35,7 +35,6 @@ class CarController:
     self.params = CarControllerParams(CP)
 
     # long
-    self.last_brake = None
     self.go_sent = 0
     self.max_gear = 9
     self.op_params = opParams()
@@ -114,7 +113,6 @@ class CarController:
       
 
       if not CC.enabled:
-        self.last_brake = None
         self.go_sent = 0
 
       max_gear = 8
@@ -134,7 +132,6 @@ class CarController:
         time_for_sample = 1
         torque_limits = 50
         drivetrain_efficiency = 0.85
-        self.last_brake = None
         accel_req = 1 if self.go_sent < 10 else 0
         self.go_sent += 0
         decel_req = False
@@ -183,8 +180,6 @@ class CarController:
 
         override_request = CS.out.gasPressed or CS.out.brakePressed
         if override_request:
-          self.last_torque = None
-          self.last_brake = None
           decel_req = None
           accel_req = 0
           torque = None
@@ -212,8 +207,6 @@ class CarController:
                               0, 1))
           
         elif not CS.longEnabled or not CS.out.cruiseState.enabled:
-          self.last_brake = None
-          self.last_torque = None
           self.max_gear = 9
 
           can_sends.append(acc_command(self.packer, self.frame / 2, 0, CS.out.cruiseState.available, CS.out.cruiseState.enabled, False, False, 8, False, 0, 0, 1))
@@ -287,17 +280,3 @@ class CarController:
 
     return new_actuators, can_sends
 
-  def acc_brake(self, aTarget):
-    brake_target = aTarget
-    if self.last_brake is None:
-      self.last_brake = min(0., brake_target / 2)
-    else:
-      tBrake = brake_target
-      lBrake = self.last_brake
-      if tBrake < lBrake:
-        diff = min(BRAKE_CHANGE, (lBrake - tBrake) / 2)
-        self.last_brake = max(lBrake - diff, tBrake)
-      elif tBrake - lBrake > 0.01:  # don't let up unless it's a big enough jump
-        diff = min(BRAKE_CHANGE, (tBrake - lBrake) / 2)
-        self.last_brake = min(lBrake + diff, tBrake)
-    return self.last_brake
