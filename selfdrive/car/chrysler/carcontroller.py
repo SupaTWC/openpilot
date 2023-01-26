@@ -131,11 +131,7 @@ class CarController:
       accel_req = False
       standstill = False
       decel = 4
-<<<<<<< HEAD
-      torque = -2
-=======
       torque = 0
->>>>>>> bac63c80d35c683c4e109b6baa1f7ccd447109e8
       max_gear = 8
       
         
