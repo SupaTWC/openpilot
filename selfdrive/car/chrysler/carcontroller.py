@@ -36,6 +36,8 @@ class CarController:
 
     # long
     self.go_sent = 0
+    self.reset = 1
+    self.resume_pressed = 0
     self.max_gear = 9
     self.op_params = opParams()
 
@@ -112,8 +114,10 @@ class CarController:
       #LONG
       
 
-      if not CC.enabled:
+      if not CC.enabled: #might be redundant
         self.go_sent = 0
+        self.reset = 1
+        self.resume_pressed = 0
 
       max_gear = 8
 
@@ -126,6 +130,8 @@ class CarController:
         decel = self.accel
         max_gear = 8
         self.go_sent = 0
+        self.reset = 1
+        self.resume_pressed = 0
         
 
       else:
@@ -133,38 +139,16 @@ class CarController:
         torque_limits = 50
         drivetrain_efficiency = 0.85
         accel_req = 1 if self.go_sent < 10 else 0
-        self.go_sent += 0
+        self.go_sent += 1
         decel_req = False
         
-        # delta_accel = CC.actuators.accel - CS.out.aEgo
-
-        # distance_moved = ((delta_accel * time_for_sample**2)/2) + (CS.out.vEgo * time_for_sample)
-        # torque = (self.CP.mass * delta_accel * distance_moved * time_for_sample)/((drivetrain_efficiency * CS.engineRpm * 2 * math.pi) / 60)
-
-        # # force (N) = mass (kg) * acceleration (m/s^2)
-        # force = self.CP.mass * delta_accel
-        # # distance_moved (m) =  (acceleration(m/s^2) * time(s)^2 / 2) + velocity(m/s) * time(s)
-        # distance_moved = ((delta_accel) * (time_for_sample**2))/2) + (CS.out.vEgo * time_for_sample)
-        # # work (J) = force (N) * distance (m)
-        # work = force * distance_moved
-        # # Power (W)= work(J) * time (s)
-        # power = work * time_for_sample
-        # # torque = Power (W) / (RPM * 2 * pi / 60)
-        # torque = power/((drivetrain_efficiency * CS.engineRpm * 2 * math.pi) / 60)
         desired_velocity = ((self.accel-CS.out.aEgo) * time_for_sample) + CS.out.vEgo
-        # kinetic energy (J) = 1/2 * mass (kg) * velocity (m/s)^2
-        # use the kinetic energy from the desired velocity - the kinetic energy from the current velocity to get the change in velocity
         kinetic_energy = ((self.CP.mass * desired_velocity **2)/2) - ((self.CP.mass * CS.out.vEgo**2)/2)
-        # convert kinetic energy to torque
-        # torque(NM) = (kinetic energy (J) * 9.55414 (Nm/J) * time(s))/RPM
+
         torque = (kinetic_energy * 9.55414 * time_for_sample)/(drivetrain_efficiency * CS.engineRpm + 0.001)
-        torque = clip(torque, -torque_limits, torque_limits) # clip torque to -6 to 6 Nm for sanity
+        torque = clip(torque, -torque_limits, torque_limits) 
 
         if CS.engineTorque < 0 and torque > 0:
-          #If the engine is producing negative torque, we need to return to a reasonable torque value quickly.
-          # rough estimate of external forces in N
-          total_forces = 650
-          #torque required to maintain speed
           torque = 40
 
         #If torque is positive, add the engine torque to the torque we calculated. This is because the engine torque is the torque the engine is producing.
@@ -186,6 +170,8 @@ class CarController:
           self.max_gear = 9
           decel = None
           self.go_sent = 0
+          self.reset = 1
+          self.resume_pressed = 0
 
           can_sends.append(acc_command(self.packer, self.frame / 2, 0,
                              CS.out.cruiseState.available,
@@ -272,6 +258,18 @@ class CarController:
       if CS.lkas_car_model != -1:
         can_sends.append(create_lkas_hud(self.packer, self.CP, lkas_active, CC.hudControl.visualAlert, self.hud_count, CS.lkas_car_model, CS))
         self.hud_count += 1
+
+        #resume button control
+    if CS.button_counter % 4 == 0:
+      if self.reset == 0:
+        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=False))
+        self.reset = 1
+      if (self.accel_req == 1 or self.go_sent == 1) and self.resume_pressed == 0:
+      #self.target_resume = (CS.button_counter + 5)%16 
+        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
+        self.reset = 0
+        self.resume_pressed = 1
+
 
     self.frame += 1
 
