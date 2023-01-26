@@ -225,6 +225,21 @@ static int chrysler_rx_hook(CANPacket_t *to_push) {
 
   if (valid) {
 
+    if ((addr == chrysler_addrs->CRUISE_BUTTONS) && (bus == 0)) {
+      bool cancel_button = GET_BIT(to_push, 0U);
+      bool accel_button = GET_BIT(to_push, 2U);
+      bool decel_button = GET_BIT(to_push, 3U);
+      bool resume_button = GET_BIT(to_push, 4U);
+      // exit controls once main or cancel are pressed
+      if (cancel_button) {
+        controls_allowed = 0;
+      }
+      // enter controls on the falling edge of set or resume
+      if ((accel_button || decel_button || resume_button)) {
+        controls_allowed = 1;
+      }
+    }
+
     // Measured EPS torque
     if ((bus == 0) && (addr == chrysler_addrs->EPS_2)) {
       int torque_meas_new = ((GET_BYTE(to_push, 4) & 0x7U) << 8) + GET_BYTE(to_push, 5) - 1024U;
@@ -232,11 +247,11 @@ static int chrysler_rx_hook(CANPacket_t *to_push) {
     }
 
     // enter controls on rising edge of ACC, exit controls on ACC off
-    const int das_3_bus = (chrysler_platform == CHRYSLER_PACIFICA) ? 0 : 2;
-    if ((bus == das_3_bus) && (addr == chrysler_addrs->DAS_3)) {
-      bool cruise_engaged = GET_BIT(to_push, 21U) == 1U;
-    pcm_cruise_check(cruise_engaged);
-    }
+    // const int das_3_bus = (chrysler_platform == CHRYSLER_PACIFICA) ? 0 : 2;
+    // if ((bus == das_3_bus) && (addr == chrysler_addrs->DAS_3)) {
+    //   bool cruise_engaged = GET_BIT(to_push, 21U) == 1U;
+    // pcm_cruise_check(cruise_engaged);
+    // }
 
     // TODO: use the same message for both
     // update vehicle moving
