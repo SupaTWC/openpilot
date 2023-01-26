@@ -260,15 +260,15 @@ class CarController:
         self.hud_count += 1
 
         #resume button control
-    if CS.button_counter % 4 == 0:
+    if CS.button_counter % 6 == 0:
       if self.reset == 0:
         can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=False))
         self.reset = 1
-      if (self.accel_req == 1 or self.go_sent == 1) and self.resume_pressed == 0:
+      if (self.accel > 0 or self.go_sent == 1) and CS.out.vEgo < 1 and self.resume_pressed < 10:
       #self.target_resume = (CS.button_counter + 5)%16 
         can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
         self.reset = 0
-        self.resume_pressed = 1
+        self.resume_pressed += 1
 
 
     self.frame += 1
