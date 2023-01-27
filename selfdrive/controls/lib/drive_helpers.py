@@ -46,8 +46,8 @@ class VCruiseHelper:
 
   @property
   def v_cruise_initialized(self):
-    if self.CP.carName == "chrysler":
-      return True
+    # if self.CP.carName == "chrysler":
+    #   return True
     return self.v_cruise_kph != V_CRUISE_INITIAL
 
   def update_v_cruise(self, CS, enabled, is_metric):
@@ -96,8 +96,12 @@ class VCruiseHelper:
 
     # Don't adjust speed when pressing resume to exit standstill
     cruise_standstill = self.button_change_states[button_type]["standstill"] or CS.cruiseState.standstill
-    if button_type == ButtonType.accelCruise and cruise_standstill:
-      return
+    if self.CP.carName == "chrysler":
+      if button_type == ButtonType.resumeCruise and cruise_standstill:
+        return
+    else:
+      if button_type == ButtonType.accelCruise and cruise_standstill:
+        return
 
     # Don't adjust speed if we've enabled since the button was depressed (some ports enable on rising edge)
     if not self.button_change_states[button_type]["enabled"]:
@@ -110,8 +114,12 @@ class VCruiseHelper:
       self.v_cruise_kph += v_cruise_delta * CRUISE_INTERVAL_SIGN[button_type]
 
     # If set is pressed while overriding, clip cruise speed to minimum of vEgo
-    if CS.gasPressed and button_type in (ButtonType.decelCruise, ButtonType.setCruise):
-      self.v_cruise_kph = max(self.v_cruise_kph, CS.vEgo * CV.MS_TO_KPH)
+    if self.CP.carName == "chrysler":
+      if CS.gasPressed and button_type in (ButtonType.decelCruise, ButtonType.accelCruise):
+        self.v_cruise_kph = max(self.v_cruise_kph, CS.vEgo * CV.MS_TO_KPH)
+    else:    
+      if CS.gasPressed and button_type in (ButtonType.decelCruise, ButtonType.setCruise):
+        self.v_cruise_kph = max(self.v_cruise_kph, CS.vEgo * CV.MS_TO_KPH)
 
     self.v_cruise_kph = clip(round(self.v_cruise_kph, 1), V_CRUISE_MIN, V_CRUISE_MAX)
 
@@ -133,8 +141,12 @@ class VCruiseHelper:
       return
 
     # 250kph or above probably means we never had a set speed
-    if any(b.type in (ButtonType.accelCruise, ButtonType.resumeCruise) for b in CS.buttonEvents) and self.v_cruise_kph_last < 250:
-      self.v_cruise_kph = self.v_cruise_kph_last
+    if self.CP.carName == "chrysler": #Chrysler/Jeep has its own resume button
+      if any(b.type in (ButtonType.resumeCruise) for b in CS.buttonEvents) and self.v_cruise_kph_last < 250:
+        self.v_cruise_kph = self.v_cruise_kph_last          
+    elif self.CP.carName is None or self.CP.carName != "chrysler":
+      if any(b.type in (ButtonType.accelCruise, ButtonType.resumeCruise) for b in CS.buttonEvents) and self.v_cruise_kph_last < 250:
+        self.v_cruise_kph = self.v_cruise_kph_last
     else:
       self.v_cruise_kph = int(round(clip(CS.vEgo * CV.MS_TO_KPH, V_CRUISE_ENABLE_MIN, V_CRUISE_MAX)))
 

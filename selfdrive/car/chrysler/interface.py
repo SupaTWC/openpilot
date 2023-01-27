@@ -54,9 +54,9 @@ class CarInterface(CarInterfaceBase):
       ret.longitudinalActuatorDelayUpperBound = 0.6 # s
       ret.stoppingDecelRate = 0.3 
       #ret.stoppingControl = True
-      ret.startingState = True
-      ret.vEgoStarting = 0.1 #default 0.5, hyundai 0.1
-      ret.startAccel = 8.0
+      ret.startingState = False
+      ret.vEgoStarting = 0.3 #default 0.5, hyundai 0.1
+      ret.startAccel = 4.0
       ret.vEgoStopping = 0.05
       ret.pcmCruise = False #no stock set speed
       ret.carName = "chrysler"
@@ -80,10 +80,11 @@ class CarInterface(CarInterfaceBase):
       ret.stoppingDecelRate = 0.3 
       #ret.stoppingControl = True
       ret.startingState = True
-      ret.vEgoStarting = 0.1 #default 0.5, hyundai 0.1
-      ret.startAccel = 8.0
+      ret.vEgoStarting = 0.3 #default 0.5, hyundai 0.1
+      ret.startAccel = 4.0
       ret.vEgoStopping = 0.05
       ret.pcmCruise = False #no stock set speed
+      ret.carName = "chrysler"
 
     # Ram
     elif candidate == CAR.RAM_1500:

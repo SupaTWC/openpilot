@@ -36,7 +36,7 @@ class CarController:
 
     # long
     self.go_sent = 0
-    self.reset = 1
+    self.reset = 0
     self.resume_pressed = 0
     self.max_gear = 9
     self.op_params = opParams()
@@ -136,7 +136,7 @@ class CarController:
 
       else:
         time_for_sample = 1
-        torque_limits = 50
+        torque_limits = 30
         drivetrain_efficiency = 0.85
         accel_req = 1 if self.go_sent < 10 else 0
         self.go_sent += 1
@@ -146,10 +146,10 @@ class CarController:
         kinetic_energy = ((self.CP.mass * desired_velocity **2)/2) - ((self.CP.mass * CS.out.vEgo**2)/2)
 
         torque = (kinetic_energy * 9.55414 * time_for_sample)/(drivetrain_efficiency * CS.engineRpm + 0.001)
-        torque = clip(torque, -torque_limits, torque_limits) 
+        torque = clip(torque, 0.01, torque_limits) 
 
-        if CS.engineTorque < 0 and torque > 0:
-          torque = 40
+        if CS.engineTorque < 0:
+          torque = 15
 
         #If torque is positive, add the engine torque to the torque we calculated. This is because the engine torque is the torque the engine is producing.
         else:
