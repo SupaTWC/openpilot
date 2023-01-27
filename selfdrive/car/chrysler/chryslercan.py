@@ -85,7 +85,7 @@ def das_3_message(packer, bus, counter, enabled, available, accel_req, decel_req
     'COUNTER': counter % 0x10,
     'ACC_DECEL_REQ': decel_req,
     'ACC_DECEL': decel,
-    'ENGINE_TORQUE_REQUEST_MAX': 0 if torque < 0.01 else enabled,
+    'ENGINE_TORQUE_REQUEST_MAX': accel_req,
     'ENGINE_TORQUE_REQUEST': torque,
     'GR_MAX_REQ': 9 if max_gear is None else max_gear,
     'ACC_STANDSTILL': standstill,#  stand_still,
@@ -106,7 +106,6 @@ def das_4_message(packer, bus, state, speed):
   }
 
   return packer.make_can_msg("DAS_4", bus, values) 
-  
 
 def das_5_message(packer, bus, CP, speed, frame):
   values = {
