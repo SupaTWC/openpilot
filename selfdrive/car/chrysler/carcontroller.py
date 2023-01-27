@@ -100,7 +100,7 @@ class CarController:
       if self.last_acc != CC.enabled:
         self.long_active = True
 
-      elif CC.enabled:
+      elif CC.enabled and not CS.out.gasPressed:
         if CC.actuators.accel < brake_threshold:
           decel_req = True
           # max_gear = 9
