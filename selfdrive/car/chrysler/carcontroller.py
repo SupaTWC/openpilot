@@ -42,14 +42,12 @@ class CarController:
     self.speed = 0
     self.long_active = False
     self.last_acc = False
-    self.last_brake = None
 
   def update(self, CC, CS):
     can_sends = []
 
     lkas_active = CC.latActive and not CS.lkasdisabled
-    if not CC.enabled:
-      self.last_brake = None
+
     # cruise buttons
     if (CS.button_counter != self.last_button_frame):
       das_bus = 2 if self.CP.carFingerprint in RAM_CARS else 0
@@ -98,7 +96,6 @@ class CarController:
       decel = 4
       torque = 0
       max_gear = 8
-      
         
       if self.last_acc != CC.enabled:
         self.long_active = True
@@ -114,7 +111,6 @@ class CarController:
           decel = CC.actuators.accel
 
         else:
-          self.last_brake = None
           accel_req = True
           # if CS.out.vEgo < 0.1 and CC.actuators.accel > 0:
           if starting:
@@ -161,15 +157,6 @@ class CarController:
                                     max_gear,
                                     standstill,
                                     decel))
-      can_sends.append(das_3_message(self.packer, das_3_counter, self.long_active,
-                                    CS.out.cruiseState.available,
-                                    accel_req, 
-                                    decel_req,
-                                    accel_go,
-                                    torque,
-                                    max_gear,
-                                    standstill,
-                                    decel, 2))
 
       can_sends.append(das_5_message(self.packer, 0, self.CP, self.speed, self.frame / 2))
 
@@ -251,17 +238,3 @@ class CarController:
     new_actuators.steer = self.apply_steer_last / self.params.STEER_MAX
 
     return new_actuators, can_sends
-  def acc_brake(self, aTarget):
-      brake_target = aTarget
-      if self.last_brake is None:
-        self.last_brake = min(0., brake_target / 2)
-      else:
-        tBrake = brake_target
-        lBrake = self.last_brake
-        if tBrake < lBrake:
-          diff = min(BRAKE_CHANGE, (lBrake - tBrake) / 2)
-          self.last_brake = max(lBrake - diff, tBrake)
-        elif tBrake - lBrake > 0.01:  # don't let up unless it's a big enough jump
-          diff = min(BRAKE_CHANGE, (tBrake - lBrake) / 2)
-          self.last_brake = min(lBrake + diff, tBrake)
-      return self.last_brake
