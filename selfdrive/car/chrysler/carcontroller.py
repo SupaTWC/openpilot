@@ -99,8 +99,10 @@ class CarController:
       decel = 4
       torque = 0
       max_gear = 8
-      self.go_sent = 0
-      self.resume_pressed = 0
+      
+      if not CC.enabled or not CS.out.cruiseState.available:
+        self.go_sent = 0
+        self.resume_pressed = 0
         
       if self.last_acc != CC.enabled:
         self.long_active = True
