@@ -42,14 +42,13 @@ class CarController:
     self.speed = 0
     self.long_active = False
     self.last_acc = False
-    self.go_sent = 0
-    self.reset = 0
-    self.resume_pressed = 0
 
   def update(self, CC, CS):
     can_sends = []
 
     lkas_active = CC.latActive and not CS.lkasdisabled
+    stopping = CC.actuators.longControlState == LongCtrlState.stopping
+    starting = CC.actuators.longControlState == LongCtrlState.starting
 
     # cruise buttons
     if (CS.button_counter != self.last_button_frame):
@@ -68,6 +67,10 @@ class CarController:
           self.accel_sent = False
           can_sends.append(create_cruise_buttons(self.packer, CS.button_counter, das_bus, CS.cruise_buttons, cancel=CC.cruiseControl.cancel, resume=CC.cruiseControl.resume))
 
+      # Resume accel from standstill
+      elif starting and  CS.button_counter % 14 == 0:
+        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, das_bus, CS.cruise_buttons, resume=True))
+
        # ACC cancellation
       elif CC.cruiseControl.cancel:
         can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, das_bus, CS.cruise_buttons, cancel=True))
@@ -80,8 +83,6 @@ class CarController:
 
     #LONG
       das_3_counter = self.frame / 2
-      stopping = CC.actuators.longControlState == LongCtrlState.stopping
-      starting = CC.actuators.longControlState == LongCtrlState.starting
       self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
       self.long_active = CC.enabled
       self.speed = CC.hudControl.setSpeed
@@ -99,37 +100,30 @@ class CarController:
       decel = 4
       torque = 0
       max_gear = 8
-      
-      if not CC.enabled or not CS.out.cruiseState.available:
-        self.go_sent = 0
-        self.resume_pressed = 0
         
       if self.last_acc != CC.enabled:
         self.long_active = True
 
-      elif CC.enabled and not CS.out.gasPressed:
+      elif CC.enabled:
         if CC.actuators.accel < brake_threshold:
           decel_req = True
           max_gear = 9
           if stopping and CS.out.vEgo < 0.01:
-            #standstill = True
+            standstill = True
             max_gear = 2
           decel = CC.actuators.accel
-          self.go_sent = 0
-          self.resume_pressed = 0
 
         else:
           accel_req = True
           # if CS.out.vEgo < 0.1 and CC.actuators.accel > 0:
-          # if starting:
-          #   accel_go = True
-          accel_go = 1 if self.go_sent < 10 else 0
-          self.go_sent += 1
-          self.calc_velocity = ((self.accel-CS.out.aEgo) * time_for_sample) + CS.out.vEgo
-          if self.op_params.get('comma_speed'):
-            self.desired_velocity = min(CC.actuators.speed, self.speed)
-          else:
-            self.desired_velocity = min(self.calc_velocity, self.speed)
+          if starting:
+            accel_go = True
+
+          # self.calc_velocity = ((self.accel-CS.out.aEgo) * time_for_sample) + CS.out.vEgo
+          # if self.op_params.get('comma_speed'):
+          self.desired_velocity = min(CC.actuators.speed, self.speed)
+          # else:
+          #   self.desired_velocity = min(self.calc_velocity, self.speed)
 
           # kinetic energy (J) = 1/2 * mass (kg) * velocity (m/s)^2
           # use the kinetic energy from the desired velocity - the kinetic energy from the current velocity to get the change in velocity
@@ -147,14 +141,13 @@ class CarController:
             # total_forces = 650
             # #torque required to maintain speed
             # torque = (total_forces * CS.out.vEgo * 9.55414)/(CS.engineRpm * drivetrain_efficiency + 0.001)
-            torque = torque_limits
+            torque = 75
 
           #If torque is positive, add the engine torque to the torque we calculated. This is because the engine torque is the torque the engine is producing.
           else:
             torque += CS.engineTorque
 
           torque = max(torque, (0 - self.op_params.get('min_torque')))
-
       
       self.last_acc = CC.enabled
 
@@ -242,18 +235,6 @@ class CarController:
       if self.frame % 100 == 0:
         can_sends.append(create_chime_message(self.packer, 0))
         can_sends.append(create_chime_message(self.packer, 2))  
-    #resume button control
-    if CS.button_counter % 6 == 0:
-      if self.reset == 0:
-        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=False))
-        self.reset = 1
-      if (self.accel > 0 or self.go_sent == 1) and CS.out.vEgo < 0.5:
-        if self.resume_pressed < 10:
-          can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
-          self.resume_pressed += 1
-        else: #unpress it
-          self.reset = 0
-
 
     self.frame += 1
 
