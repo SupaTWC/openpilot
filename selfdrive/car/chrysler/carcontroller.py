@@ -42,6 +42,9 @@ class CarController:
     self.speed = 0
     self.long_active = False
     self.last_acc = False
+    self.go_sent = 0
+    self.reset = 0
+    self.resume_pressed = 0
 
   def update(self, CC, CS):
     can_sends = []
@@ -96,6 +99,8 @@ class CarController:
       decel = 4
       torque = 0
       max_gear = 8
+      self.go_sent = 0
+      self.resume_pressed = 0
         
       if self.last_acc != CC.enabled:
         self.long_active = True
@@ -105,16 +110,19 @@ class CarController:
           decel_req = True
           max_gear = 9
           if stopping and CS.out.vEgo < 0.01:
-            standstill = True
+            #standstill = True
             max_gear = 2
           decel = CC.actuators.accel
+          self.go_sent = 0
+          self.resume_pressed = 0
 
         else:
           accel_req = True
           # if CS.out.vEgo < 0.1 and CC.actuators.accel > 0:
-          if starting:
-            accel_go = True
-
+          # if starting:
+          #   accel_go = True
+          accel_go = 1 if self.go_sent < 10 else 0
+          self.go_sent += 1
           self.calc_velocity = ((self.accel-CS.out.aEgo) * time_for_sample) + CS.out.vEgo
           if self.op_params.get('comma_speed'):
             self.desired_velocity = min(CC.actuators.speed, self.speed)
@@ -137,13 +145,14 @@ class CarController:
             # total_forces = 650
             # #torque required to maintain speed
             # torque = (total_forces * CS.out.vEgo * 9.55414)/(CS.engineRpm * drivetrain_efficiency + 0.001)
-            torque = 75
+            torque = torque_limits
 
           #If torque is positive, add the engine torque to the torque we calculated. This is because the engine torque is the torque the engine is producing.
           else:
             torque += CS.engineTorque
 
           torque = max(torque, (0 - self.op_params.get('min_torque')))
+
       
       self.last_acc = CC.enabled
 
@@ -231,6 +240,18 @@ class CarController:
       if self.frame % 100 == 0:
         can_sends.append(create_chime_message(self.packer, 0))
         can_sends.append(create_chime_message(self.packer, 2))  
+    #resume button control
+    if CS.button_counter % 6 == 0:
+      if self.reset == 0:
+        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=False))
+        self.reset = 1
+      if (self.accel > 0 or self.go_sent == 1) and CS.out.vEgo < 0.5:
+        if self.resume_pressed < 10:
+          can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
+          self.resume_pressed += 1
+        else: #unpress it
+          self.reset = 0
+
 
     self.frame += 1
 
