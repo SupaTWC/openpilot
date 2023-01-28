@@ -116,7 +116,6 @@ class CarController:
 
       if not CC.enabled: #might be redundant
         self.go_sent = 0
-        self.reset = 0
         self.resume_pressed = 0
 
       max_gear = 8
@@ -169,7 +168,6 @@ class CarController:
           torque = None
           self.max_gear = 9
           decel = None
-          self.reset = 0
 
           can_sends.append(acc_command(self.packer, self.frame / 2, 0,
                              CS.out.cruiseState.available,
