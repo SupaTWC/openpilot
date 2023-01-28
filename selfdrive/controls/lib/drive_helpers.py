@@ -142,7 +142,7 @@ class VCruiseHelper:
 
     # 250kph or above probably means we never had a set speed
     if self.CP.carName == "chrysler": #Chrysler/Jeep has its own resume button
-      if any(b.type in (ButtonType.resumeCruise) for b in CS.buttonEvents) and self.v_cruise_kph_last < 250:
+      if (b.type == ButtonType.resumeCruise for b in CS.buttonEvents) and self.v_cruise_kph_last < 250:
         self.v_cruise_kph = self.v_cruise_kph_last          
     elif self.CP.carName is None or self.CP.carName != "chrysler":
       if any(b.type in (ButtonType.accelCruise, ButtonType.resumeCruise) for b in CS.buttonEvents) and self.v_cruise_kph_last < 250:
