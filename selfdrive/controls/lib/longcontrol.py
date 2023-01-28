@@ -74,7 +74,8 @@ class LongControl:
 
   def update(self, active, CS, long_plan, accel_limits, t_since_plan):
     self.stoppingDecelRate = self.op_params.get('stopping_decel_rate')
-    self.longitudinalActuatorDelayUpperBound = self.op_params.get('long_act_delay')
+    self.longitudinalActuatorDelayUpperBound = self.op_params.get('long_act_delay_upper')
+    self.longitudinalActuatorDelayLowerBound = self.op_params.get('long_act_delay_lower')
     
     """Update longitudinal control. This updates the state machine and runs a PID loop"""
     # Interp control trajectory
@@ -139,4 +140,4 @@ class LongControl:
 
     self.last_output_accel = clip(output_accel, accel_limits[0], accel_limits[1])
 
-    return self.last_output_accel
+    return self.last_output_accel, v_target
