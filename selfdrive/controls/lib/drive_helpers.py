@@ -141,12 +141,10 @@ class VCruiseHelper:
       return
 
     # 250kph or above probably means we never had a set speed
-    if self.CP.carName == "chrysler": #Chrysler/Jeep has its own resume button
-      if (b.type == ButtonType.resumeCruise for b in CS.buttonEvents) and self.v_cruise_kph_last < 250:
-        self.v_cruise_kph = self.v_cruise_kph_last          
-    elif self.CP.carName is None or self.CP.carName != "chrysler":
-      if any(b.type in (ButtonType.accelCruise, ButtonType.resumeCruise) for b in CS.buttonEvents) and self.v_cruise_kph_last < 250:
-        self.v_cruise_kph = self.v_cruise_kph_last
+    if self.CP.carName == "chrysler" and (b.type == ButtonType.resumeCruise for b in CS.buttonEvents) and self.v_cruise_kph_last < 250:
+      self.v_cruise_kph = self.v_cruise_kph_last          
+    elif self.CP.carName is None or self.CP.carName != "chrysler" and any(b.type in (ButtonType.accelCruise, ButtonType.resumeCruise) for b in CS.buttonEvents) and self.v_cruise_kph_last < 250:
+      self.v_cruise_kph = self.v_cruise_kph_last
     else:
       self.v_cruise_kph = int(round(clip(CS.vEgo * CV.MS_TO_KPH, V_CRUISE_ENABLE_MIN, V_CRUISE_MAX)))
 
