@@ -115,7 +115,7 @@ class VCruiseHelper:
 
     # If set is pressed while overriding, clip cruise speed to minimum of vEgo
     if self.CP.carName == "chrysler":
-      if CS.gasPressed and button_type in (ButtonType.decelCruise, ButtonType.accelCruise):
+      if CS.gasPressed and button_type in (ButtonType.decelCruise, ButtonType.accelCruise, ButtonType.setCruise):
         self.v_cruise_kph = max(self.v_cruise_kph, CS.vEgo * CV.MS_TO_KPH)
     else:    
       if CS.gasPressed and button_type in (ButtonType.decelCruise, ButtonType.setCruise):
