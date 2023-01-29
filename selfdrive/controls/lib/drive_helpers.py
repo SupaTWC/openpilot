@@ -46,8 +46,8 @@ class VCruiseHelper:
 
   @property
   def v_cruise_initialized(self):
-    # if self.CP.carName == "chrysler":
-    #   return True
+    if self.CP.carName == "chrysler":
+      return True
     return self.v_cruise_kph != V_CRUISE_INITIAL
 
   def update_v_cruise(self, CS, enabled, is_metric):
@@ -143,7 +143,7 @@ class VCruiseHelper:
     # 250kph or above probably means we never had a set speed
     if self.CP.carName == "chrysler" and (b.type == ButtonType.resumeCruise for b in CS.buttonEvents) and self.v_cruise_kph_last < 250:
       self.v_cruise_kph = self.v_cruise_kph_last          
-    elif self.CP.carName is None or self.CP.carName != "chrysler" and any(b.type in (ButtonType.accelCruise, ButtonType.resumeCruise) for b in CS.buttonEvents) and self.v_cruise_kph_last < 250:
+    elif (self.CP.carName is None or self.CP.carName != "chrysler") and any(b.type in (ButtonType.accelCruise, ButtonType.resumeCruise) for b in CS.buttonEvents) and self.v_cruise_kph_last < 250:
       self.v_cruise_kph = self.v_cruise_kph_last
     else:
       self.v_cruise_kph = int(round(clip(CS.vEgo * CV.MS_TO_KPH, V_CRUISE_ENABLE_MIN, V_CRUISE_MAX)))
