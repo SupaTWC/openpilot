@@ -36,6 +36,7 @@ class CarController:
 
     # long
     self.go_sent = 0
+    self.accel = 0
     self.reset = 0
     self.resume_pressed = 0
     self.max_gear = 9
@@ -161,13 +162,13 @@ class CarController:
       if self.CP.carFingerprint not in RAM_CARS:
       
 
-        override_request = CS.out.gasPressed or CS.out.brakePressed
+        override_request = CS.out.gasPressed or CS.out.brakePressed or not CS.longEnabled or not CS.out.cruiseState.enabled
         if override_request:
           decel_req = None
           accel_req = 0
           torque = None
           self.max_gear = 9
-          decel = None
+          decel = 4
 
           can_sends.append(acc_command(self.packer, self.frame / 2, 0,
                              CS.out.cruiseState.available,
@@ -188,11 +189,7 @@ class CarController:
                               decel,
                               0, 1))
           
-        elif not CS.longEnabled or not CS.out.cruiseState.enabled:
-          self.max_gear = 9
-
-          can_sends.append(acc_command(self.packer, self.frame / 2, 0, CS.out.cruiseState.available, CS.out.cruiseState.enabled, False, False, 8, False, 0, 0, 1))
-          can_sends.append(acc_command(self.packer, self.frame / 2, 2, CS.out.cruiseState.available, CS.out.cruiseState.enabled, False, False, 8, False, 0, 0, 1))
+        
 
         else:
           max_gear = 9
