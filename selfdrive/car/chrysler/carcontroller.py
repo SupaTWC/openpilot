@@ -108,8 +108,8 @@ class CarController:
 
       elif CC.actuators.accel < brake_threshold:
         accel_go = False
-        decel_req = False
         accel_req = False
+        decel_req = False
         standstill = False
         torque = None
         decel = self.accel
@@ -122,6 +122,7 @@ class CarController:
         drivetrain_efficiency = 0.85
         accel_req = True
         decel_req = False
+        decel = None
         accel_go = 1 if self.go_sent < 10 else 0
         self.go_sent += 1 
         
