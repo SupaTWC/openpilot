@@ -125,6 +125,8 @@ class CarController:
         decel = None
         accel_go = 1 if self.go_sent < 10 else 0
         self.go_sent += 1 
+        max_gear = 8
+        standstill = False
         
         desired_velocity = ((self.accel-CS.out.aEgo) * time_for_sample) + CS.out.vEgo
         kinetic_energy = ((self.CP.mass * desired_velocity **2)/2) - ((self.CP.mass * CS.out.vEgo**2)/2)
