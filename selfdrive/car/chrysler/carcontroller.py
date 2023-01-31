@@ -145,7 +145,7 @@ class CarController:
       
       self.last_acc = CC.enabled
 
-      can_sends.append(das_3_message(self.packer, 0, das_3_counter, self.long_active,
+      can_sends.append(das_3_message(self.packer, 0, das_3_counter, CS.out.cruiseState.enabled,
                                     CS.out.cruiseState.available,
                                     accel_req, 
                                     decel_req,
@@ -160,7 +160,7 @@ class CarController:
       can_sends.append(acc_log(self.packer, CC.actuators.accel, CC.actuators.speed, self.calc_velocity, CS.out.aEgo, CS.out.vEgo))
 
       if self.CP.carFingerprint not in RAM_CARS:
-        can_sends.append(das_3_message(self.packer, 2, das_3_counter, self.long_active,
+        can_sends.append(das_3_message(self.packer, 2, das_3_counter, CS.out.cruiseState.enabled,
                                       CS.out.cruiseState.available,
                                       accel_req, 
                                       decel_req,
