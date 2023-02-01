@@ -93,7 +93,7 @@ def acc_command(packer, counter, bus, available, enabled, accel_req, torque, max
     'ACC_DECEL': 4 if decel is None else decel, #4 when not braking according to Cabana
     'ENGINE_TORQUE_REQUEST_MAX': 0 if (torque is None or torque <= 0) else enabled,
     'ENGINE_TORQUE_REQUEST': 0 if torque is None else torque,
-    'GR_MAX_REQ': 8 if max_gear is None else max_gear,
+    'GR_MAX_REQ': 9 if max_gear is None else max_gear,
     'ACC_GO': accel_req,
   }
     

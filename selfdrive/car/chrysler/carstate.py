@@ -109,6 +109,9 @@ class CarState(CarStateBase):
       self.torqMax = cp.vl["ECM_TRQ"]["ENGINE_TORQ_MAX"]
       self.engineRpm = cp.vl["ECM_1"]["ENGINE_RPM"]
       self.engineTorque = cp.vl["ECM_1"]["ENGINE_TORQUE"]
+      self.inputSpeed = cp.vl["TRANS_SPEED"]["INPUT_SPEED"]
+      self.tcLocked = cp.vl["TRANS_SPEED"]["TC_LOCKED"]
+      self.tcSlipPct = (self.inputSpeed/(self.engineRpm + 0.001)) + 0.001
 
     else:
       ret.cruiseState.nonAdaptive = False
@@ -255,6 +258,8 @@ class CarState(CarStateBase):
       ("ENGINE_TORQ_MIN", "ECM_TRQ", 0),
       ("ENGINE_TORQ_MAX", "ECM_TRQ", 0),
       ("CurrentGear", "TCM_A7", 0),
+      ("INPUT_SPEED", "TRANS_SPEED"),
+      ("TC_LOCKED", "TRANS_SPEED"),
     ]
 
     checks = [
@@ -272,6 +277,7 @@ class CarState(CarStateBase):
       ("ECM_TRQ", 50),
       ("TCM_A7", 50),
       ("ESP_8", 50),
+      ("TRANS_SPEED", 50),
     ]
 
     if CP.enableBsm:

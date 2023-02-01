@@ -123,7 +123,7 @@ class CarController:
 
       self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
 
-      if CC.actuators.accel < 0: #- self.op_params.get('brake_threshold'):
+      if CC.actuators.accel < -0.1: #- self.op_params.get('brake_threshold'):
         accel_req = False
         decel_req = False
         torque = None
@@ -132,11 +132,14 @@ class CarController:
         self.go_sent = 0
         self.reset = 1
         self.resume_pressed = 0
+        if CS.out.vEgo < 0.01:
+          max_gear = 2
+          torque = 15
         
       elif CS.out.gasPressed:
         accel_req = False
         decel_req = False
-        torque = None
+        torque = CS.engineTorque
         decel = None
         max_gear = 8
         self.go_sent = 10
@@ -144,7 +147,7 @@ class CarController:
 
       else:
         time_for_sample = 0.25
-        torque_limits = 30
+        torque_limits = 20
         drivetrain_efficiency = 0.85
         accel_req = 1 if self.go_sent < 10 else 0
         self.go_sent += 1
@@ -154,9 +157,11 @@ class CarController:
         kinetic_energy = ((self.CP.mass * desired_velocity **2)/2) - ((self.CP.mass * CS.out.vEgo**2)/2)
 
         torque = (kinetic_energy * 9.55414 * time_for_sample)/(drivetrain_efficiency * CS.engineRpm + 0.001)
+        if not CS.tcLocked and CS.tcSlipPct > 0:
+            torque = torque/CS.tcSlipPct
         torque = clip(torque, 0.01, torque_limits) 
 
-        if CS.engineTorque < 0:
+        if CS.engineTorque < 0:# or CS.out.vEgo < 0.2:
           torque = 15
 
         #If torque is positive, add the engine torque to the torque we calculated. This is because the engine torque is the torque the engine is producing.
