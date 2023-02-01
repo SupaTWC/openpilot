@@ -110,8 +110,7 @@ class CarState(CarStateBase):
       self.engineRpm = cp.vl["ECM_1"]["ENGINE_RPM"]
       self.engineTorque = cp.vl["ECM_1"]["ENGINE_TORQUE"]
       self.inputSpeed = cp.vl["TRANS_SPEED"]["INPUT_SPEED"]
-      self.tcLocked = cp.vl["TRANS_SPEED"]["TC_LOCKED"]
-      self.tcSlipPct = (self.inputSpeed/(self.engineRpm + 0.001)) + 0.001
+
 
     else:
       ret.cruiseState.nonAdaptive = False
@@ -126,6 +125,8 @@ class CarState(CarStateBase):
       self.engineTorque = cp.vl["ECM_1"]["ENGINE_TORQUE"]
       self.maxgear = 9
       self.lkasHeartbit = cp_cam.vl["LKAS_HEARTBIT"]
+      self.tcLocked = cp.vl["TRANS_SPEED"]["TC_LOCKED"]
+      self.tcSlipPct = (self.inputSpeed/(self.engineRpm + 0.001)) + 0.001
 
 
     if self.CP.carFingerprint in RAM_CARS:
