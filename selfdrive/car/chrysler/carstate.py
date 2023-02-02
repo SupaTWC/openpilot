@@ -109,7 +109,6 @@ class CarState(CarStateBase):
       self.torqMax = cp.vl["ECM_TRQ"]["ENGINE_TORQ_MAX"]
       self.engineRpm = cp.vl["ECM_1"]["ENGINE_RPM"]
       self.engineTorque = cp.vl["ECM_1"]["ENGINE_TORQUE"]
-      self.inputSpeed = cp.vl["TRANS_SPEED"]["INPUT_SPEED"]
 
 
     else:
@@ -125,6 +124,7 @@ class CarState(CarStateBase):
       self.engineTorque = cp.vl["ECM_1"]["ENGINE_TORQUE"]
       self.maxgear = 9
       self.lkasHeartbit = cp_cam.vl["LKAS_HEARTBIT"]
+      self.inputSpeed = cp.vl["TRANS_SPEED"]["INPUT_SPEED"]
       self.tcLocked = cp.vl["TRANS_SPEED"]["TC_LOCKED"]
       self.tcSlipPct = (self.inputSpeed/(self.engineRpm + 0.001)) + 0.001
 
