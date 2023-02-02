@@ -132,8 +132,8 @@ class CarController:
         self.go_sent = 0
         self.reset = 1
         self.resume_pressed = 0
-        if CS.out.vEgo < 0.01:
-          max_gear = 2
+        # if CS.out.vEgo < 0.01:
+        #   max_gear = 2
           #torque = 15
         
       elif CS.out.gasPressed:
