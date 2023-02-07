@@ -56,6 +56,7 @@ class CarState(CarStateBase):
     # brake pedal
     ret.brake = 0
     ret.brakePressed = cp.vl["ESP_1"]['Brake_Pedal_State'] == 1  # Physical brake pedal switch
+    self.accBrakePressed = cp.vl["ESP_1"]["BRAKE_PRESSED_ACC"]
 
     # gas pedal
     ret.gas = cp.vl["ECM_5"]["Accelerator_Position"]
@@ -227,6 +228,7 @@ class CarState(CarStateBase):
       ("DOOR_OPEN_RL", "BCM_1"),
       ("DOOR_OPEN_RR", "BCM_1"),
       ("Brake_Pedal_State", "ESP_1"),
+      ("BRAKE_PRESSED_ACC", "ESP_1"),
       ("Vehicle_Speed", "ESP_1"),
       ("Accelerator_Position", "ECM_5"),
       ("WHEEL_SPEED_FL", "ESP_6"),

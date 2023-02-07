@@ -270,7 +270,7 @@ class CarController:
       # if self.reset == 0:
       #   can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=False))
       #   self.reset = 1
-      if self.accel > 0 and CS.out.vEgo < 0.1:
+      if self.accel > 0 and (CS.out.vEgo < 0.1 or CS.accBrakePressed):
         # if self.resume_pressed < 10:
         can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
           # self.resume_pressed += 1
