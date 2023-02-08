@@ -159,7 +159,7 @@ class CarController:
         torque = (kinetic_energy * 9.55414 * time_for_sample)/(drivetrain_efficiency * CS.engineRpm + 0.001)
         if not CS.tcLocked and CS.tcSlipPct > 0:
             torque = torque/CS.tcSlipPct
-        torque = clip(torque, 0.01, torque_limits) 
+        torque = clip(torque, -5, torque_limits) 
 
         if CS.engineTorque < 0:# or CS.out.vEgo < 0.2:
           torque = 15
