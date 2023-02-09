@@ -147,7 +147,7 @@ class CarController:
 
       else:
         time_for_sample = 0.25
-        torque_limits = 25
+        torque_limits = 40
         drivetrain_efficiency = 0.85
         accel_req = 1 if self.go_sent < 10 else 0
         self.go_sent += 1
@@ -164,7 +164,7 @@ class CarController:
         elif CS.out.vEgo > CC.hudControl.setSpeed * 0.95: torque/3.5
         torque = clip(round(torque,2), -7, torque_limits) 
 
-        if CS.engineTorque < 0:# or CS.out.vEgo < 0.2:
+        if CS.engineTorque < 0 and torque > 0:# or CS.out.vEgo < 0.2:
           torque = 15
 
         #If torque is positive, add the engine torque to the torque we calculated. This is because the engine torque is the torque the engine is producing.
