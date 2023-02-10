@@ -166,7 +166,7 @@ class CarController:
         #   else:
         #     torque /= 2
         if CS.out.vEgo < 0.05:
-          torque = 40
+          torque = 30
 
         if CS.engineTorque < 0 and torque > 0:# or CS.out.vEgo < 0.2:
           torque = 15
