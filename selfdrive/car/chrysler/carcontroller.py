@@ -160,8 +160,11 @@ class CarController:
         # if not CS.tcLocked and CS.tcSlipPct > 0:
         #     torque = torque/CS.tcSlipPct
         torque = (self.accel- max(CS.out.aEgo,0)) * torque_limits
-        if CS.out.vEgo > 5: torque/2
-        elif CS.out.vEgo > CC.hudControl.setSpeed * 0.95: torque/3.5
+        if CS.out.vEgo > 5: 
+          if CS.out.vEgo > CC.hudControl.setSpeed * 2: 
+            torque /= 4
+          else:
+            torque /= 2
         
 
         if CS.engineTorque < 0 and torque > 0:# or CS.out.vEgo < 0.2:
