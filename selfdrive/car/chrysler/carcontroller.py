@@ -72,7 +72,7 @@ class CarController:
         CS.longEnabled = False
 
       if CS.longAvailable:
-        if CS.button_pressed(ButtonType.cancel) or CS.out.brakePressed or (CS.longEnabled and not CS.enabled):
+        if CS.button_pressed(ButtonType.cancel) or CS.out.brakePressed:# or (CS.longEnabled and not CS.enabled):
           CS.longEnabled = False
         elif (CS.button_pressed(ButtonType.accelCruise) or \
             CS.button_pressed(ButtonType.decelCruise) or \
