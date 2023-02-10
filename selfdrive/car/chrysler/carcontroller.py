@@ -208,26 +208,26 @@ class CarController:
           
         
 
-        # else:
+        else:
         #   max_gear = 9
-        can_sends.append(acc_command(self.packer, self.frame / 2, 0,
-                            CS.out.cruiseState.available,
-                            CS.longEnabled,
-                            accel_req,
-                            torque,
-                            max_gear,
-                            decel_req,
-                            decel,
-                            0, 1))
-        can_sends.append(acc_command(self.packer, self.frame / 2, 2,
-                            CS.out.cruiseState.available,
-                            CS.longEnabled,
-                            accel_req,
-                            torque,
-                            max_gear,
-                            decel_req,
-                            decel,
-                            0, 1))
+          can_sends.append(acc_command(self.packer, self.frame / 2, 0,
+                              CS.out.cruiseState.available,
+                              CS.longEnabled,
+                              accel_req,
+                              torque,
+                              max_gear,
+                              decel_req,
+                              decel,
+                              0, 1))
+          can_sends.append(acc_command(self.packer, self.frame / 2, 2,
+                              CS.out.cruiseState.available,
+                              CS.longEnabled,
+                              accel_req,
+                              torque,
+                              max_gear,
+                              decel_req,
+                              decel,
+                              0, 1))
         if self.frame % 2 == 0:
           can_sends.append(create_acc_1_message(self.packer, 0, self.frame / 2))
           can_sends.append(create_acc_1_message(self.packer, 2, self.frame / 2))
