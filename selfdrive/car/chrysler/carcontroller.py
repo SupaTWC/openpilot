@@ -171,7 +171,7 @@ class CarController:
           torque = 15
 
         #If torque is positive, add the engine torque to the torque we calculated. This is because the engine torque is the torque the engine is producing.
-        if CS.out.vEgo < 0.05:
+        if CS.out.vEgo < 0.02:
           torque = min(30+CS.engineTorque,150)
         else:
           torque += CS.engineTorque
