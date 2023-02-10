@@ -163,6 +163,9 @@ class CarController:
         # if CS.out.vEgo > 5: 
         if CS.out.vEgo > CC.hudControl.setSpeed * 0.9: 
           torque /= 3
+        else: 
+          torque = clip(torque,-40, 40)
+
         #   else:
         #     torque /= 2
         
@@ -171,8 +174,8 @@ class CarController:
           torque = 15
 
         #If torque is positive, add the engine torque to the torque we calculated. This is because the engine torque is the torque the engine is producing.
-        if CS.out.vEgo < -0.02 and self.accel > 0:
-          torque = min(20+CS.engineTorque,150)
+        elif CS.out.vEgo < -0.02 and self.accel > 0:
+          torque = min(30+CS.engineTorque,150)
         else:
           torque += CS.engineTorque
           torque = max(round(torque,2), -10) 
