@@ -147,7 +147,7 @@ class CarController:
 
       else:
         time_for_sample = 0.25
-        torque_limits = 40
+        torque_limits = 30
         drivetrain_efficiency = 0.85
         accel_req = 1 if self.go_sent < 10 else 0
         self.go_sent += 1
@@ -159,13 +159,14 @@ class CarController:
         # torque = (kinetic_energy * 9.55414 * time_for_sample)/(drivetrain_efficiency * CS.engineRpm + 0.001)
         # if not CS.tcLocked and CS.tcSlipPct > 0:
         #     torque = torque/CS.tcSlipPct
-        torque = (self.accel- max(CS.out.aEgo,0)) * torque_limits
-        if CS.out.vEgo > 5: 
-          if CS.out.vEgo > CC.hudControl.setSpeed * 2: 
-            torque /= 4
-          else:
-            torque /= 2
-        
+        torque = (self.accel- max(CS.out.aEgo/2,0)) * torque_limits
+        # if CS.out.vEgo > 5: 
+        #   if CS.out.vEgo > CC.hudControl.setSpeed * 2: 
+        #     torque /= 4
+        #   else:
+        #     torque /= 2
+        if CS.out.vEgo < 0.05:
+          torque = 40
 
         if CS.engineTorque < 0 and torque > 0:# or CS.out.vEgo < 0.2:
           torque = 15
