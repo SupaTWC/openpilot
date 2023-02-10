@@ -159,19 +159,20 @@ class CarController:
         # torque = (kinetic_energy * 9.55414 * time_for_sample)/(drivetrain_efficiency * CS.engineRpm + 0.001)
         # if not CS.tcLocked and CS.tcSlipPct > 0:
         #     torque = torque/CS.tcSlipPct
-        torque = (self.accel- max(CS.out.aEgo/2,0)) * torque_limits
+        torque = (self.accel- max(CS.out.aEgo/1.5,0)) * torque_limits
         # if CS.out.vEgo > 5: 
         #   if CS.out.vEgo > CC.hudControl.setSpeed * 2: 
         #     torque /= 4
         #   else:
         #     torque /= 2
-        if CS.out.vEgo < 0.05:
-          torque = 30
+        
 
         if CS.engineTorque < 0 and torque > 0:# or CS.out.vEgo < 0.2:
           torque = 15
 
         #If torque is positive, add the engine torque to the torque we calculated. This is because the engine torque is the torque the engine is producing.
+        if CS.out.vEgo < 0.05:
+          torque = min(30+CS.engineTorque,150)
         else:
           torque += CS.engineTorque
           torque = max(round(torque,2), -10) 
