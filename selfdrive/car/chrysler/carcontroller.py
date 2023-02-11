@@ -147,7 +147,8 @@ class CarController:
 
       else:
         time_for_sample = 0.25
-        torque_limits = 30
+        torque_at_1 = 30 #at accel == 1.0
+        max_torque = 40
         drivetrain_efficiency = 0.85
         
         if (self.go_sent < 10 and self.accel >0):
@@ -163,24 +164,24 @@ class CarController:
         # torque = (kinetic_energy * 9.55414 * time_for_sample)/(drivetrain_efficiency * CS.engineRpm + 0.001)
         # if not CS.tcLocked and CS.tcSlipPct > 0:
         #     torque = torque/CS.tcSlipPct
-        torque = (self.accel- max(CS.out.aEgo/1.5,0)) * torque_limits
+        torque = (self.accel- max(CS.out.aEgo/1.5,0)) * torque_at_1
         # if CS.out.vEgo > 5: 
         if CS.out.vEgo > CC.hudControl.setSpeed * 0.9: 
           torque /= 3
         else: 
-          torque = clip(torque,-40, 40)
+          torque = clip(torque,-40, max_torque)
 
         #   else:
         #     torque /= 2
         
 
-        if CS.engineTorque < 0 and torque > 0:# or CS.out.vEgo < 0.2:
+        if (CS.engineTorque < 0 and torque > 0):# or CS.out.vEgo < 0.2:
           torque = 15
 
-        #If torque is positive, add the engine torque to the torque we calculated. This is because the engine torque is the torque the engine is producing.
-        elif CS.out.vEgo < 1 and self.accel > 0.1:
+        elif CS.out.vEgo < 1 and self.accel > 0.1 and not CS.accBrakePressed:
           torque = min(30+CS.engineTorque,70)
         else:
+        #If torque is positive, add the engine torque to the torque we calculated. This is because the engine torque is the torque the engine is producing.
           torque += CS.engineTorque
           torque = max(round(torque,2), -10) 
 
@@ -282,11 +283,12 @@ class CarController:
         self.hud_count += 1
 
         #resume button control
-    if CS.button_counter % 6 == 0:
+    if (CS.out.vEgo < 0.01 and CS.accBrakePressed):
       # if self.reset == 0:
       #   can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=False))
       #   self.reset = 1
-      if self.accel > 0 and (CS.out.vEgo < 0.1 or CS.accBrakePressed):
+      #if self.accel > 0 and (CS.out.vEgo < 0.1 or CS.accBrakePressed):
+      if CS.button_counter % 6 == 0:
         if (CS.button_counter != self.last_button_frame):
           self.last_button_frame = CS.button_counter
           can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
