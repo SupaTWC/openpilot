@@ -149,8 +149,12 @@ class CarController:
         time_for_sample = 0.25
         torque_limits = 30
         drivetrain_efficiency = 0.85
-        accel_req = 1 if (self.go_sent < 10 and self.accel >0.05) else 0
-        self.go_sent += 1
+        
+        if (self.go_sent < 10 and self.accel >0):
+          accel_req = 1 
+          self.go_sent +=1
+        else: accel_req = 0
+        
         decel_req = False
         
         # desired_velocity = ((self.accel-CS.out.aEgo) * time_for_sample) + CS.out.vEgo
@@ -174,7 +178,7 @@ class CarController:
           torque = 15
 
         #If torque is positive, add the engine torque to the torque we calculated. This is because the engine torque is the torque the engine is producing.
-        elif CS.out.vEgo < -0.02 and self.accel > 0:
+        elif CS.out.vEgo < 0.02 and self.accel > 0:
           torque = min(30+CS.engineTorque,150)
         else:
           torque += CS.engineTorque
