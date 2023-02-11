@@ -178,7 +178,7 @@ class CarController:
           torque = 15
 
         #If torque is positive, add the engine torque to the torque we calculated. This is because the engine torque is the torque the engine is producing.
-        elif CS.out.vEgo < 1 and self.accel > 0:
+        elif CS.out.vEgo < 1 and self.accel > 0.1:
           torque = min(30+CS.engineTorque,70)
         else:
           torque += CS.engineTorque
@@ -287,8 +287,9 @@ class CarController:
       #   can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=False))
       #   self.reset = 1
       if self.accel > 0 and (CS.out.vEgo < 0.1 or CS.accBrakePressed):
-        # if self.resume_pressed < 10:
-        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
+        if (CS.button_counter != self.last_button_frame):
+          self.last_button_frame = CS.button_counter
+          can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
           # self.resume_pressed += 1
         # else: #unpress it
         #   self.reset = 0
