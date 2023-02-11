@@ -178,8 +178,8 @@ class CarController:
           torque = 15
 
         #If torque is positive, add the engine torque to the torque we calculated. This is because the engine torque is the torque the engine is producing.
-        elif CS.out.vEgo < 0.02 and self.accel > 0:
-          torque = min(30+CS.engineTorque,150)
+        elif CS.out.vEgo < 1 and self.accel > 0:
+          torque = min(30+CS.engineTorque,70)
         else:
           torque += CS.engineTorque
           torque = max(round(torque,2), -10) 
