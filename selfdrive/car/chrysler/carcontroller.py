@@ -72,7 +72,7 @@ class CarController:
         CS.longEnabled = False
 
       if CS.longAvailable:
-        if CS.button_pressed(ButtonType.cancel) or CS.out.brakePressed:# or (CS.longEnabled and not CS.enabled):
+        if CS.button_pressed(ButtonType.cancel) or CS.out.brakePressed or (CS.longEnabled and not CC.enabled):
           CS.longEnabled = False
         elif (CS.button_pressed(ButtonType.accelCruise) or \
             CS.button_pressed(ButtonType.decelCruise) or \
@@ -113,13 +113,7 @@ class CarController:
 
       can_sends.append(create_lkas_command(self.packer, self.CP, int(apply_steer), lkas_control_bit))
       #LONG
-      
 
-      if not CC.enabled: #might be redundant
-        self.go_sent = 0
-        self.resume_pressed = 0
-
-      max_gear = 8
 
       self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
 
@@ -148,7 +142,7 @@ class CarController:
       else:
         time_for_sample = 0.25
         torque_at_1 = 30 #at accel == 1.0
-        max_torque = 40
+        max_torque = 38
         drivetrain_efficiency = 0.85
         
         if (self.go_sent < 10 and self.accel >0):
@@ -198,48 +192,49 @@ class CarController:
           torque = None
           max_gear = 9
           decel = 4
-
-          can_sends.append(acc_command(self.packer, self.frame / 2, 0,
-                             CS.out.cruiseState.available,
-                             CS.out.cruiseState.enabled,
-                             accel_req,
-                             torque,
-                             max_gear,
-                             decel_req,
-                             decel,
-                             0, 1))
-          can_sends.append(acc_command(self.packer, self.frame / 2, 2,
-                              CS.out.cruiseState.available,
-                              CS.out.cruiseState.enabled,
-                              accel_req,
-                              torque,
-                              max_gear,
-                              decel_req,
-                              decel,
-                              0, 1))
+          self.go_sent = 0
+          self.resume_pressed = 0
+          # can_sends.append(acc_command(self.packer, self.frame / 2, 0,
+          #                    CS.out.cruiseState.available,
+          #                    CS.out.cruiseState.enabled,
+          #                    accel_req,
+          #                    torque,
+          #                    max_gear,
+          #                    decel_req,
+          #                    decel,
+          #                    0, 1))
+          # can_sends.append(acc_command(self.packer, self.frame / 2, 2,
+          #                     CS.out.cruiseState.available,
+          #                     CS.out.cruiseState.enabled,
+          #                     accel_req,
+          #                     torque,
+          #                     max_gear,
+          #                     decel_req,
+          #                     decel,
+          #                     0, 1))
           
         
 
-        else:
-        #   max_gear = 9
-          can_sends.append(acc_command(self.packer, self.frame / 2, 0,
-                              CS.out.cruiseState.available,
-                              CS.longEnabled,
-                              accel_req,
-                              torque,
-                              max_gear,
-                              decel_req,
-                              decel,
-                              0, 1))
-          can_sends.append(acc_command(self.packer, self.frame / 2, 2,
-                              CS.out.cruiseState.available,
-                              CS.longEnabled,
-                              accel_req,
-                              torque,
-                              max_gear,
-                              decel_req,
-                              decel,
-                              0, 1))
+        # else:
+        # #   max_gear = 9
+        can_sends.append(acc_command(self.packer, self.frame / 2, 0,
+                            CS.out.cruiseState.available,
+                            CS.longEnabled,
+                            accel_req,
+                            torque,
+                            max_gear,
+                            decel_req,
+                            decel,
+                            0, 1))
+        can_sends.append(acc_command(self.packer, self.frame / 2, 2,
+                            CS.out.cruiseState.available,
+                            CS.longEnabled,
+                            accel_req,
+                            torque,
+                            max_gear,
+                            decel_req,
+                            decel,
+                            0, 1))
         if self.frame % 2 == 0:
           can_sends.append(create_acc_1_message(self.packer, 0, self.frame / 2))
           can_sends.append(create_acc_1_message(self.packer, 2, self.frame / 2))
