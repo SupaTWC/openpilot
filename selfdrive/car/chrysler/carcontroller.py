@@ -39,7 +39,6 @@ class CarController:
     self.accel = 0
     self.reset = 0
     self.resume_pressed = 0
-    max_gear = 9
     self.op_params = opParams()
 
   def update(self, CC, CS):
@@ -116,7 +115,7 @@ class CarController:
 
 
       self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
-
+      max_gear = 9
       if CC.actuators.accel < -0.1: #- self.op_params.get('brake_threshold'):
         accel_req = False
         decel_req = False
