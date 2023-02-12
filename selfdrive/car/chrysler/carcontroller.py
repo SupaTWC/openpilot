@@ -39,7 +39,7 @@ class CarController:
     self.accel = 0
     self.reset = 0
     self.resume_pressed = 0
-    self.max_gear = 9
+    max_gear = 9
     self.op_params = opParams()
 
   def update(self, CC, CS):
@@ -135,7 +135,7 @@ class CarController:
         decel_req = False
         torque = CS.engineTorque
         decel = None
-        max_gear = 8
+        max_gear = 9
         self.go_sent = 10
         self.resume_pressed = 0
 
