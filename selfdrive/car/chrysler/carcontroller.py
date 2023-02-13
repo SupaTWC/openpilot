@@ -115,7 +115,7 @@ class CarController:
 
 
       self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
-      max_gear = 9
+      
       if CC.actuators.accel < -0.1: #- self.op_params.get('brake_threshold'):
         accel_req = False
         decel_req = False
@@ -181,6 +181,7 @@ class CarController:
         
         
       #ECU Disabled
+      max_gear = 9
       if self.CP.carFingerprint not in RAM_CARS:
       
 
