@@ -55,7 +55,7 @@ class CarInterface(CarInterfaceBase):
       ret.stoppingDecelRate = 0.3 
       #ret.stoppingControl = True
       ret.startingState = False
-      ret.vEgoStarting = 0.05 #default 0.5, hyundai 0.1
+      ret.vEgoStarting = 0.1 #default 0.5, hyundai 0.1
       ret.startAccel = 2.0
       ret.vEgoStopping = 0.05
       ret.pcmCruise = False #no stock set speed
