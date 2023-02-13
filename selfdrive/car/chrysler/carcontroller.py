@@ -170,8 +170,8 @@ class CarController:
         if (CS.engineTorque < 0 and torque > 0):# or CS.out.vEgo < 0.2:
           torque = 15
 
-        elif CS.out.vEgo < 1 and self.accel > 0.1 and not CS.accBrakePressed:
-          torque = min(30+CS.engineTorque,70)
+        # elif CS.out.vEgo < 1 and self.accel > 0.1 and not CS.accBrakePressed:
+        #   torque = min(30+CS.engineTorque,70)
         else:
         
           torque += CS.engineTorque
