@@ -157,9 +157,9 @@ class CarController:
         # torque = (kinetic_energy * 9.55414 * time_for_sample)/(drivetrain_efficiency * CS.engineRpm + 0.001)
         # if not CS.tcLocked and CS.tcSlipPct > 0:
         #     torque = torque/CS.tcSlipPct
-        torque = (self.accel- max(CS.out.aEgo/1.5,0)) * torque_at_1
+        torque = (self.accel- max(CS.out.aEgo,0)) * torque_at_1
         # if CS.out.vEgo > 5: 
-        if CS.out.vEgo > CC.hudControl.setSpeed * 0.9: 
+        if CS.out.vEgo > CC.hudControl.setSpeed * 0.9 and torque > 0: 
           torque /= 3
         torque = clip(torque,-max_torque, max_torque)
 
@@ -167,15 +167,15 @@ class CarController:
         #     torque /= 2
         
 
-        if (CS.engineTorque < 0 and torque > 0):# or CS.out.vEgo < 0.2:
-          torque = 15
+        # if (CS.engineTorque < 0 and torque > 0):# or CS.out.vEgo < 0.2:
+        #   torque = 15
 
         # elif CS.out.vEgo < 1 and self.accel > 0.1 and not CS.accBrakePressed:
         #   torque = min(30+CS.engineTorque,70)
-        else:
+        # else:
         
-          torque += CS.engineTorque
-          torque = max(round(torque,2), -10) #Min total engine torque requested (for engine braking) is limited to -10
+        torque += CS.engineTorque
+        torque = max(round(torque,2), 0) #Min total engine torque requested 
 
         decel = None
         
