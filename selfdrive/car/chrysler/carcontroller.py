@@ -168,7 +168,7 @@ class CarController:
         #     torque = torque/CS.tcSlipPct
         torque = (self.accel- max(CS.out.aEgo,0)) * torque_at_1
         # if CS.out.vEgo > 5: 
-        if CS.out.vEgo > CC.hudControl.setSpeed * 0.9: 
+        if CS.out.vEgo > CC.hudControl.setSpeed * 0.9 and torque > 0: 
           torque /= 3
         torque = clip(torque,-max_torque, max_torque)
 
