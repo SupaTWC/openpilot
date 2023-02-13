@@ -221,7 +221,7 @@ class CarController:
                             CS.longEnabled,
                             accel_req,
                             torque,
-                            max_gear,
+                            9,
                             decel_req,
                             decel,
                             0, 1))
@@ -230,7 +230,7 @@ class CarController:
                             CS.longEnabled,
                             accel_req,
                             torque,
-                            max_gear,
+                            9,
                             decel_req,
                             decel,
                             0, 1))
