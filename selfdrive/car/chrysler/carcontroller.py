@@ -153,7 +153,7 @@ class CarController:
         max_torque = 40
         drivetrain_efficiency = 0.85
         
-        if (self.go_sent < 10 and self.accel >0):
+        if self.go_sent < 10 and self.accel >0 and not CS.accBrakePressed:
           accel_req = 1 
           self.go_sent +=1
         else: accel_req = 0
@@ -166,7 +166,7 @@ class CarController:
         # torque = (kinetic_energy * 9.55414 * time_for_sample)/(drivetrain_efficiency * CS.engineRpm + 0.001)
         # if not CS.tcLocked and CS.tcSlipPct > 0:
         #     torque = torque/CS.tcSlipPct
-        torque = (self.accel- max(CS.out.aEgo/1.5,0)) * torque_at_1
+        torque = (self.accel- max(CS.out.aEgo,0)) * torque_at_1
         # if CS.out.vEgo > 5: 
         if CS.out.vEgo > CC.hudControl.setSpeed * 0.9: 
           torque /= 3
@@ -178,8 +178,9 @@ class CarController:
 
         if (CS.engineTorque < 0 and torque > 0):# or CS.out.vEgo < 0.2:
           torque = 15
-
-        elif CS.out.vEgo < 1 and self.accel > 0.1 and not CS.accBrakePressed:
+        elif CS.accBrakePressed:
+          torque = CS.engineTorque + 1
+        elif CS.out.vEgo < 1 and self.accel > 0.1:
           torque = min(30+CS.engineTorque,70)
         else:
         
@@ -290,7 +291,7 @@ class CarController:
 
       self.button_frame += 1
       button_counter_offset = 1
-      if (CS.out.vEgo < 0.01 and CS.accBrakePressed):
+      if (CS.out.vEgo < 0.05 and self.accel > 0.01):
       # if self.reset == 0:
       #   can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=False))
       #   self.reset = 1
