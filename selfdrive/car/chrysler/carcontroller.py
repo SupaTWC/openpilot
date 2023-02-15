@@ -151,12 +151,7 @@ class CarController:
         
         decel_req = False
         
-        # desired_velocity = ((self.accel-CS.out.aEgo) * time_for_sample) + CS.out.vEgo
-        # kinetic_energy = ((self.CP.mass * desired_velocity **2)/2) - ((self.CP.mass * CS.out.vEgo**2)/2)
 
-        # torque = (kinetic_energy * 9.55414 * time_for_sample)/(drivetrain_efficiency * CS.engineRpm + 0.001)
-        # if not CS.tcLocked and CS.tcSlipPct > 0:
-        #     torque = torque/CS.tcSlipPct
         torque = (self.accel- max(CS.out.aEgo,0)) * torque_at_1
         # if CS.out.vEgo > 5: 
         if CS.out.vEgo > CC.hudControl.setSpeed * 0.9 and torque > 0: 
