@@ -153,9 +153,10 @@ class CarController:
         max_torque = 40
         drivetrain_efficiency = 0.85
         
-        if self.go_sent < 10 and self.accel >0 and not CS.accBrakePressed:
+        #if self.go_sent < 10 and self.accel >0 and not CS.accBrakePressed:
+        if CS.out.eVgo < 0.1:
           accel_req = 1 
-          self.go_sent +=1
+          #self.go_sent +=1
         else: accel_req = 0
         
         decel_req = False
@@ -292,9 +293,7 @@ class CarController:
       self.button_frame += 1
       button_counter_offset = 1
       if (CS.out.vEgo < 0.05 and self.accel > 0.01):
-      # if self.reset == 0:
-      #   can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=False))
-      #   self.reset = 1
+
       #if self.accel > 0 and (CS.out.vEgo < 0.1 or CS.accBrakePressed):
       # if CS.button_counter % 6 == 0:
           
@@ -302,9 +301,7 @@ class CarController:
         if button_counter_offset is not None:
           # can_sends.append(create_wheel_buttons_command(self.packer, 0, CS.button_counter + button_counter_offset, "ACC_Resume"))
           can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+button_counter_offset, 0, CS.cruise_buttons, resume=True))
-          # self.resume_pressed += 1
-        # else: #unpress it
-        #   self.reset = 0
+
 
 
     self.frame += 1
