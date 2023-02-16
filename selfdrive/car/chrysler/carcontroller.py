@@ -145,7 +145,7 @@ class CarController:
         drivetrain_efficiency = 0.85
         
         # if (self.go_sent < 10 and self.accel >0):
-        if CS.out.vEgo < 0.1:
+        if self.accel > 0 and CS.out.vEgo < 0.1:
           accel_req = 1 
           #self.go_sent +=1
         else: accel_req = 0
