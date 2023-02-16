@@ -144,9 +144,10 @@ class CarController:
         max_torque = 38
         drivetrain_efficiency = 0.85
         
-        if (self.go_sent < 10 and self.accel >0):
+        # if (self.go_sent < 10 and self.accel >0):
+        if CS.out.vEgo < 0.1:
           accel_req = 1 
-          self.go_sent +=1
+          #self.go_sent +=1
         else: accel_req = 0
         
         decel_req = False
@@ -189,24 +190,7 @@ class CarController:
           decel = 4
           self.go_sent = 0
           self.resume_pressed = 0
-          # can_sends.append(acc_command(self.packer, self.frame / 2, 0,
-          #                    CS.out.cruiseState.available,
-          #                    CS.out.cruiseState.enabled,
-          #                    accel_req,
-          #                    torque,
-          #                    max_gear,
-          #                    decel_req,
-          #                    decel,
-          #                    0, 1))
-          # can_sends.append(acc_command(self.packer, self.frame / 2, 2,
-          #                     CS.out.cruiseState.available,
-          #                     CS.out.cruiseState.enabled,
-          #                     accel_req,
-          #                     torque,
-          #                     max_gear,
-          #                     decel_req,
-          #                     decel,
-          #                     0, 1))
+
           
         
 
@@ -273,17 +257,13 @@ class CarController:
 
         #resume button control
     if (CS.out.vEgo < 0.01 and self.accel > 0.1):
-      # if self.reset == 0:
-      #   can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=False))
-      #   self.reset = 1
+
       #if self.accel > 0 and (CS.out.vEgo < 0.1 or CS.accBrakePressed):
       if CS.button_counter % 6 == 0:
         if (CS.button_counter != self.last_button_frame):
           self.last_button_frame = CS.button_counter
           can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
-          # self.resume_pressed += 1
-        # else: #unpress it
-        #   self.reset = 0
+
 
 
     self.frame += 1
