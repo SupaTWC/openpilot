@@ -157,6 +157,8 @@ class CarController:
         # if CS.out.vEgo > 5: 
         if CS.out.vEgo > CC.hudControl.setSpeed * 0.9 and torque > 0: 
           torque /= 3
+        elif CS.out.vEgo < 2:
+          torque *=3
         torque = clip(torque,-max_torque, max_torque)
 
         #   else:
@@ -255,8 +257,8 @@ class CarController:
         can_sends.append(create_lkas_hud(self.packer, self.CP, lkas_active, CC.hudControl.visualAlert, self.hud_count, CS.lkas_car_model, CS))
         self.hud_count += 1
 
-        #resume button control
-    if (CS.out.vEgo < 0.01 and self.accel > 0.1):
+    #resume button control
+    if (CS.out.vEgo < 0.5 and self.accel > 0.1):
 
       #if self.accel > 0 and (CS.out.vEgo < 0.1 or CS.accBrakePressed):
       if CS.button_counter % 6 == 0:
