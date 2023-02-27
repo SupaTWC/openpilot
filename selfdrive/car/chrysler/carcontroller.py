@@ -151,11 +151,6 @@ class CarController:
         max_torque = 38
         
         
-        # if (self.go_sent < 10 and self.accel >0):
-        # if self.accel > 0 and (CS.out.vEgo < 0.1 or self.go_sent < 10):
-        #   accel_req = 1 
-        #   self.go_sent +=1
-        # else: accel_req = 0
         
         decel_req = False
         
@@ -178,8 +173,13 @@ class CarController:
           self.fuel_sent = 0
 
         torque = clip(torque,-max_torque, max_torque)
+        # if (self.go_sent < 10 and self.accel >0):
+        #if self.accel > 0:# and (CS.out.vEgo < 0.1 or self.go_sent < 10):
         if torque>0:
-          accel_req =1
+          accel_req = 1 
+          self.go_sent +=1
+        else: accel_req = 0
+        
 
         #   else:
         #     torque /= 2
