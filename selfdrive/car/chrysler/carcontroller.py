@@ -225,7 +225,7 @@ class CarController:
                             9,
                             decel_req,
                             decel,
-                            0, 1, fuel))
+                            0, fuel, 1))
         can_sends.append(acc_command(self.packer, self.frame / 2, 2,
                             CS.out.cruiseState.available,
                             CS.longEnabled,
@@ -234,7 +234,7 @@ class CarController:
                             9,
                             decel_req,
                             decel,
-                            0, 1, fuel))
+                            0, fuel,1))
         if self.frame % 2 == 0:
           can_sends.append(create_acc_1_message(self.packer, 0, self.frame / 2))
           can_sends.append(create_acc_1_message(self.packer, 2, self.frame / 2))
