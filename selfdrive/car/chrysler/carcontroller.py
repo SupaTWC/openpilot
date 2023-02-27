@@ -39,6 +39,9 @@ class CarController:
     self.accel = 0
     self.reset = 0
     self.resume_pressed = 0
+    self.fuel_sent = 0
+    self.button_frame = 0
+    self.last_button_frame = 0
     self.op_params = opParams()
 
   def update(self, CC, CS):
@@ -115,7 +118,7 @@ class CarController:
 
 
       self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
-      
+      fuel = 0
       if CC.actuators.accel < -0.1: #- self.op_params.get('brake_threshold'):
         accel_req = False
         decel_req = False
@@ -125,6 +128,10 @@ class CarController:
         self.go_sent = 0
         self.reset = 1
         self.resume_pressed = 0
+        if self.fuel_sent < 10:
+          fuel = 1
+          self.fuel_sent += 1
+
         # if CS.out.vEgo < 0.01:
         #   max_gear = 2
           #torque = 15
@@ -137,17 +144,17 @@ class CarController:
         max_gear = 9
         self.go_sent = 10
         self.resume_pressed = 0
+        self.fuel_sent = 0
 
       else:
-        time_for_sample = 0.25
         torque_at_1 = 30 #at accel == 1.0
         max_torque = 38
-        drivetrain_efficiency = 0.85
+        
         
         # if (self.go_sent < 10 and self.accel >0):
-        if self.accel > 0 and CS.out.vEgo < 0.1:
+        if self.accel > 0 and (CS.out.vEgo < 0.1 or self.go_sent < 10):
           accel_req = 1 
-          #self.go_sent +=1
+          self.go_sent +=1
         else: accel_req = 0
         
         decel_req = False
@@ -155,11 +162,23 @@ class CarController:
 
         torque = (self.accel- max(CS.out.aEgo,0)) * torque_at_1
         # if CS.out.vEgo > 5: 
-        if CS.out.vEgo > CC.hudControl.setSpeed * 0.9 and torque > 0: 
+        if torque < 0: #send acc_go when torque is > 0 again
+          self.go_sent = 0
+          if self.fuel_sent < 10:
+            fuel = 1
+            self.fuel_sent += 1
+        elif CS.out.vEgo > CC.hudControl.setSpeed * 0.9 and torque > 0: 
           torque /= 3
-        elif CS.out.vEgo < 2:
+          self.fuel_sent = 0
+        elif CS.out.vEgo < 5.3 and torque > 0:
           torque *=3
+          self.fuel_sent = 0
+        elif CS.out.vEgo > 9 and torque > 0:
+          torque *= 0.8
+          self.fuel_sent = 0
+
         torque = clip(torque,-max_torque, max_torque)
+
 
         #   else:
         #     torque /= 2
@@ -206,7 +225,7 @@ class CarController:
                             9,
                             decel_req,
                             decel,
-                            0, 1))
+                            0, 1, fuel))
         can_sends.append(acc_command(self.packer, self.frame / 2, 2,
                             CS.out.cruiseState.available,
                             CS.longEnabled,
@@ -215,7 +234,7 @@ class CarController:
                             9,
                             decel_req,
                             decel,
-                            0, 1))
+                            0, 1, fuel))
         if self.frame % 2 == 0:
           can_sends.append(create_acc_1_message(self.packer, 0, self.frame / 2))
           can_sends.append(create_acc_1_message(self.packer, 2, self.frame / 2))
@@ -258,14 +277,31 @@ class CarController:
         self.hud_count += 1
 
     #resume button control
-    if (CS.out.vEgo < 0.5 and self.accel > 0.1):
+    if (CS.out.vEgo < 0.6 and self.accel > 0.1):
 
       #if self.accel > 0 and (CS.out.vEgo < 0.1 or CS.accBrakePressed):
       if CS.button_counter % 6 == 0:
         if (CS.button_counter != self.last_button_frame):
           self.last_button_frame = CS.button_counter
           can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
+    #jve resume button control
+    # button_counter = CS.button_counter
+    # if button_counter != self.last_button_frame:
+    #   self.last_button_frame = button_counter
 
+    #   self.button_frame += 1
+    #   button_counter_offset = 1
+    #   if (CS.out.vEgo < 0.01 and CS.accBrakePressed):
+    #   # if self.reset == 0:
+    #   #   can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=False))
+    #   #   self.reset = 1
+    #   #if self.accel > 0 and (CS.out.vEgo < 0.1 or CS.accBrakePressed):
+    #   # if CS.button_counter % 6 == 0:
+
+    #     button_counter_offset = [1, 1, 0, None][self.button_frame % 4]
+    #     if button_counter_offset is not None:
+    #       # can_sends.append(create_wheel_buttons_command(self.packer, 0, CS.button_counter + button_counter_offset, "ACC_Resume"))
+    #       can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+button_counter_offset, 0, CS.cruise_buttons, resume=True))
 
 
     self.frame += 1
