@@ -278,31 +278,27 @@ class CarController:
         self.hud_count += 1
 
     #resume button control
-    if (CS.out.vEgo < 0.6 and self.accel > 0.1):
+    # if (CS.out.vEgo < 0.6 and self.accel > 0.1):
 
-      #if self.accel > 0 and (CS.out.vEgo < 0.1 or CS.accBrakePressed):
-      if CS.button_counter % 6 == 0:
-        if (CS.button_counter != self.last_button_frame):
-          self.last_button_frame = CS.button_counter
-          can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
-    #jve resume button control
-    # button_counter = CS.button_counter
-    # if button_counter != self.last_button_frame:
-    #   self.last_button_frame = button_counter
-
-    #   self.button_frame += 1
-    #   button_counter_offset = 1
-    #   if (CS.out.vEgo < 0.01 and CS.accBrakePressed):
-    #   # if self.reset == 0:
-    #   #   can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=False))
-    #   #   self.reset = 1
     #   #if self.accel > 0 and (CS.out.vEgo < 0.1 or CS.accBrakePressed):
-    #   # if CS.button_counter % 6 == 0:
+    #   if CS.button_counter % 6 == 0:
+    #     if (CS.button_counter != self.last_button_frame):
+    #       self.last_button_frame = CS.button_counter
+    #       can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
+    #jve resume button control
+    button_counter = CS.button_counter
+    if button_counter != self.last_button_frame:
+      self.last_button_frame = button_counter
 
-    #     button_counter_offset = [1, 1, 0, None][self.button_frame % 4]
-    #     if button_counter_offset is not None:
-    #       # can_sends.append(create_wheel_buttons_command(self.packer, 0, CS.button_counter + button_counter_offset, "ACC_Resume"))
-    #       can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+button_counter_offset, 0, CS.cruise_buttons, resume=True))
+      self.button_frame += 1
+      button_counter_offset = 1
+      if (CS.out.vEgo < 0.01 and CS.accBrakePressed):
+        
+
+        button_counter_offset = [1, 1, 0, None][self.button_frame % 4]
+        if button_counter_offset is not None:
+          # can_sends.append(create_wheel_buttons_command(self.packer, 0, CS.button_counter + button_counter_offset, "ACC_Resume"))
+          can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+button_counter_offset, 0, CS.cruise_buttons, resume=True))
 
 
     self.frame += 1
