@@ -95,7 +95,7 @@ def acc_command(packer, counter, bus, available, enabled, accel_req, torque, max
     'ENGINE_TORQUE_REQUEST': 0 if torque is None else torque,
     'GR_MAX_REQ': 9 if max_gear is None else max_gear,
     'ACC_GO': accel_req,
-    'DISABLE_FUEL_SHUTOFF': fuel,
+    'ACC_BRK_PREP': 0 if decel is None else enabled,
   }
     
   else: 
