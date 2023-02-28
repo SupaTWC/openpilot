@@ -163,13 +163,16 @@ class CarController:
 
             torque = clip(torque,-max_torque, max_torque)
             # if (self.go_sent < 10 and self.accel >0):
-            if torque > 0 and (CS.out.vEgo < 0.1 or self.go_sent < 10):
-            # if torque>0:
+            #if torque > 0 and (CS.out.vEgo < 0.1 or self.go_sent < 10):
+            if torque>0:
               accel_req = 1 
               self.go_sent +=1
             else: accel_req = 0
-            torque += CS.engineTorque
-            torque = max(round(torque,2), 0) #Min total engine torque requested 
+            if CS.engineTorque < 0 and torque > 0:
+              torque = 10
+            else:
+              torque += CS.engineTorque
+              torque = max(round(torque,2), 0) #Min total engine torque requested 
             decel = None
             
             
