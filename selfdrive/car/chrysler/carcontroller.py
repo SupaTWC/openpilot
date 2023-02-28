@@ -37,9 +37,7 @@ class CarController:
     # long
     self.go_sent = 0
     self.accel = 0
-    self.reset = 0
     self.resume_pressed = 0
-    self.fuel_sent = 0
     self.button_frame = 0
     self.last_button_frame = 0
     self.op_params = opParams()
@@ -118,7 +116,7 @@ class CarController:
 
 
       self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
-      fuel = 0
+ 
       if CC.actuators.accel < -0.1: #- self.op_params.get('brake_threshold'):
         accel_req = False
         decel_req = False
@@ -126,11 +124,7 @@ class CarController:
         decel = self.accel
         max_gear = 8
         self.go_sent = 0
-        self.reset = 1
         self.resume_pressed = 0
-        if self.fuel_sent < 10:
-          fuel = 1
-          self.fuel_sent += 1
 
         # if CS.out.vEgo < 0.01:
         #   max_gear = 2
@@ -144,7 +138,6 @@ class CarController:
         max_gear = 9
         self.go_sent = 10
         self.resume_pressed = 0
-        self.fuel_sent = 0
 
       else:
         torque_at_1 = 30 #at accel == 1.0
@@ -159,23 +152,18 @@ class CarController:
         # if CS.out.vEgo > 5: 
         if torque < 0: #send acc_go when torque is > 0 again
           self.go_sent = 0
-          if self.fuel_sent < 10:
-            fuel = 1
-            self.fuel_sent += 1
         elif CS.out.vEgo > CC.hudControl.setSpeed * 0.9 and torque > 0: 
           torque /= 3
-          self.fuel_sent = 0
-        elif CS.out.vEgo < 5.3 and torque > 0:
+        elif CS.out.vEgo < 5.3 and self.accel > 0:
+          torque = (self.accel) * torque_at_1
           torque *=3
-          self.fuel_sent = 0
         elif CS.out.vEgo > 9 and torque > 0:
           torque *= 0.8
-          self.fuel_sent = 0
 
         torque = clip(torque,-max_torque, max_torque)
         # if (self.go_sent < 10 and self.accel >0):
-        #if self.accel > 0:# and (CS.out.vEgo < 0.1 or self.go_sent < 10):
-        if torque>0:
+        if torque > 0 and (CS.out.vEgo < 0.1 or self.go_sent < 10):
+        # if torque>0:
           accel_req = 1 
           self.go_sent +=1
         else: accel_req = 0
@@ -214,10 +202,6 @@ class CarController:
           self.resume_pressed = 0
 
           
-        
-
-        # else:
-        # #   max_gear = 9
         can_sends.append(acc_command(self.packer, self.frame / 2, 0,
                             CS.out.cruiseState.available,
                             CS.longEnabled,
@@ -226,7 +210,7 @@ class CarController:
                             9,
                             decel_req,
                             decel,
-                            0, fuel, 1))
+                            0, 1))
         can_sends.append(acc_command(self.packer, self.frame / 2, 2,
                             CS.out.cruiseState.available,
                             CS.longEnabled,
@@ -235,7 +219,7 @@ class CarController:
                             9,
                             decel_req,
                             decel,
-                            0, fuel,1))
+                            0,1))
         if self.frame % 2 == 0:
           can_sends.append(create_acc_1_message(self.packer, 0, self.frame / 2))
           can_sends.append(create_acc_1_message(self.packer, 2, self.frame / 2))
