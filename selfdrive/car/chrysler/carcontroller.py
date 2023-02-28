@@ -276,13 +276,13 @@ class CarController:
           else:
             self.accel_active = False
 
-          
+          torque = 1547.75
           self.enabled_prev = CS.longEnabled
           can_sends.append(acc_command(self.packer, self.frame / 2, 0,
                               CS.out.cruiseState.available,
                               CS.longEnabled,
                               self.go_req,
-                              0,
+                              torque,
                               0,
                               self.decel_active,
                               self.decel_val,
@@ -291,7 +291,7 @@ class CarController:
                               CS.out.cruiseState.available,
                               CS.longEnabled,
                               self.go_req,
-                              0,
+                              torque,
                               0,
                               self.decel_active,
                               self.decel_val,
