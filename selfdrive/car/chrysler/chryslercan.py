@@ -113,9 +113,10 @@ def acc_command(packer, counter, bus, available, enabled, accel_req, torque, max
     values['GR_MAX_REQ'] = max_gear
 
   return packer.make_can_msg("DAS_3", bus, values)
-def create_acc_1_message(packer, bus, frame):
+def create_acc_1_message(packer, bus, frame, eng_req = 0, torq = 25000): #DAS_5
   values = {
-    "ACCEL_PERHAPS": 32767,
+    "ACC_ENG_REQ": eng_req,
+    "ACC_TORQ": torq,
     "COUNTER": frame % 0x10,
   }
 

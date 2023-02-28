@@ -34,7 +34,7 @@ class CarInterface(CarInterfaceBase):
     ret.minSteerSpeed = -0.1  # m/s
     if candidate in (CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020, CAR.JEEP_CHEROKEE_2019):
       # TODO: allow 2019 cars to steer down to 13 m/s if already engaged.
-      ret.minSteerSpeed = 17.5  # m/s 17 on the way up, 13 on the way down once engaged.
+      ret.minSteerSpeed = -1 #17.5  # m/s 17 on the way up, 13 on the way down once engaged.
     tune = ret.longitudinalTuning
     # Chrysler
     if candidate in (CAR.PACIFICA_2017_HYBRID, CAR.PACIFICA_2018, CAR.PACIFICA_2018_HYBRID, CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020):
