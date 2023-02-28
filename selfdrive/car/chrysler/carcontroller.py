@@ -282,7 +282,7 @@ class CarController:
                               CS.longEnabled,
                               self.go_req,
                               0,
-                              9,
+                              0,
                               self.decel_active,
                               self.decel_val,
                               0, 1))
@@ -291,7 +291,7 @@ class CarController:
                               CS.longEnabled,
                               self.go_req,
                               0,
-                              9,
+                              0,
                               self.decel_active,
                               self.decel_val,
                               0,1))
