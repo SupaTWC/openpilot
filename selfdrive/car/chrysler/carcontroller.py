@@ -213,6 +213,7 @@ class CarController:
           from selfdrive.car.chrysler.chryslerlonghelper import cluster_chime, accel_hysteresis, accel_rate_limit, \
   cruiseiconlogic, setspeedlogic, SET_SPEED_MIN, DEFAULT_DECEL, STOP_GAS_THRESHOLD, START_BRAKE_THRESHOLD, \
   STOP_BRAKE_THRESHOLD, START_GAS_THRESHOLD, CHIME_GAP_TIME, ACCEL_SCALE, ACCEL_MIN, ACCEL_MAX
+          ACCEL_TO_NM = 1200
           self.accel_lim_prev = self.accel_lim
           self.decel_val = DEFAULT_DECEL
           self.trq_val = 20
@@ -244,9 +245,9 @@ class CarController:
 
           if CS.longEnabled and not CS.out.gasPressed and not self.go_req and\
                   (self.stop_req
-                  or (apply_accel <= min(20/CV.ACCEL_TO_NM, START_BRAKE_THRESHOLD))
+                  or (apply_accel <= min(20/ACCEL_TO_NM, START_BRAKE_THRESHOLD))
                   or (self.decel_active and ((CS.out.brake > 10.) or (1 < 0.)) and
-                      (apply_accel < max((20 + 20.)/CV.ACCEL_TO_NM, STOP_BRAKE_THRESHOLD)))):
+                      (apply_accel < max((20 + 20.)/ACCEL_TO_NM, STOP_BRAKE_THRESHOLD)))):
             self.decel_active = True
             self.decel_val = apply_accel
             if self.decel_val_prev > self.decel_val and not self.done:
@@ -262,9 +263,9 @@ class CarController:
             self.decel_val_prev = CS.out.aEgo
 
           if CS.longEnabled and not CS.out.brakePressed and not (hybridStandstill and (self.stop_req or self.decel_active)) and\
-                  (apply_accel >= max(START_GAS_THRESHOLD, (20 + 20.)/CV.ACCEL_TO_NM)
-                  or self.accel_active and not self.decel_active and apply_accel > (20 - 20.)/CV.ACCEL_TO_NM):
-            self.trq_val = apply_accel * CV.ACCEL_TO_NM
+                  (apply_accel >= max(START_GAS_THRESHOLD, (20 + 20.)/ACCEL_TO_NM)
+                  or self.accel_active and not self.decel_active and apply_accel > (20 - 20.)/ACCEL_TO_NM):
+            self.trq_val = apply_accel * ACCEL_TO_NM
             self.accel = apply_accel
 
             if 300 > self.trq_val > 20:
