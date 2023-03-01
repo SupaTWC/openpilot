@@ -10,6 +10,10 @@ from common.params import Params, put_nonblocking
 from cereal import car
 
 from common.op_params import opParams
+from selfdrive.car.chrysler.chryslerlonghelper import cluster_chime, accel_hysteresis, accel_rate_limit, \
+  cruiseiconlogic, setspeedlogic, SET_SPEED_MIN, DEFAULT_DECEL, STOP_GAS_THRESHOLD, START_BRAKE_THRESHOLD, \
+  STOP_BRAKE_THRESHOLD, START_GAS_THRESHOLD, CHIME_GAP_TIME, ACCEL_SCALE, ACCEL_MIN, ACCEL_MAX
+          
 
 ButtonType = car.CarState.ButtonEvent.Type
 LongCtrlState = car.CarControl.Actuators.LongControlState
@@ -124,11 +128,13 @@ class CarController:
         if self.CP.carFingerprint not in PAC_HYBRID:
           self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
     
-          if CC.actuators.accel < -0.1: #- self.op_params.get('brake_threshold'):
+          if CC.actuators.accel < -0.05: #- self.op_params.get('brake_threshold'):
             accel_req = False
             decel_req = False
             torque = None
-            decel = self.accel
+            if CS.out.eVgo > 1:
+              decel = self.accel * 1.2
+            else: decel = self.accel
             max_gear = 8
             self.go_sent = 0
             self.resume_pressed = 0
@@ -156,8 +162,8 @@ class CarController:
             elif CS.out.vEgo > CC.hudControl.setSpeed * 0.9 and torque > 0: 
               torque /= 3
             elif CS.out.vEgo < 5.3 and self.accel > 0:
-              torque = (self.accel) * torque_at_1
-              torque *=3
+              torque = max(15,((self.accel) * torque_at_1)*3)
+              
             elif CS.out.vEgo > 9 and torque > 0:
               torque *= 0.8
 
@@ -166,7 +172,7 @@ class CarController:
             #if torque > 0 and (CS.out.vEgo < 0.1 or self.go_sent < 10):
             if torque>0:
               accel_req = 1 
-              self.go_sent +=1
+              #self.go_sent +=1
             else: accel_req = 0
             if CS.engineTorque < 0 and torque > 0:
               torque = 10
@@ -213,9 +219,6 @@ class CarController:
           #   new_msg = create_lkas_heartbit(self.packer, 0, CS.lkasHeartbit)
           #   can_sends.append(new_msg)
         elif self.CP.carFingerprint in PAC_HYBRID:
-          from selfdrive.car.chrysler.chryslerlonghelper import cluster_chime, accel_hysteresis, accel_rate_limit, \
-  cruiseiconlogic, setspeedlogic, SET_SPEED_MIN, DEFAULT_DECEL, STOP_GAS_THRESHOLD, START_BRAKE_THRESHOLD, \
-  STOP_BRAKE_THRESHOLD, START_GAS_THRESHOLD, CHIME_GAP_TIME, ACCEL_SCALE, ACCEL_MIN, ACCEL_MAX
           ACCEL_TO_NM = 1200
           self.accel_lim_prev = self.accel_lim
           self.decel_val = DEFAULT_DECEL
