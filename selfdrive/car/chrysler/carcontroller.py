@@ -155,8 +155,12 @@ class CarController:
             
             decel_req = False
             max_gear = 9
-            if CS.out.vEgo < 5.3 and self.accel > 0:
+            if CS.out.vEgo < 1 and self.accel > 0:
               torque = max(15,((self.accel) * torque_at_1)*3)
+            elif CS.out.vEgo < 3 and self.accel > 0: 
+              torque = ((self.accel) * torque_at_1)*1.5
+            elif CS.out.vEgo < 5.3 and self.accel > 0: 
+              torque = ((self.accel) * torque_at_1)*1
             else: torque = (self.accel- max(CS.out.aEgo,0)) * torque_at_1
             # if CS.out.vEgo > 5: 
             # if torque < 0: #send acc_go when torque is > 0 again
