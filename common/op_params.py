@@ -175,7 +175,7 @@ class opParams:
                         'long_p': Param(1.0, VT.number, live=True),
                         'long_i': Param(0.0, VT.number, live=True),
                         'long_time_constant': Param(1.0, VT.number, live=True),
-                        'stopping_decel_rate': Param(0.3, VT.number, live=True),
+                        'stopping_decel_rate': Param(0.5, VT.number, live=True),
                         'long_act_delay_upper': Param(0.5, VT.number, live=True),
                         'long_act_delay_lower': Param(0.5, VT.number, live=True),
                         'brake_threshold': Param(0.1, VT.number, live=True),

@@ -155,15 +155,14 @@ class CarController:
             
             decel_req = False
             max_gear = 9
-            torque = (self.accel- max(CS.out.aEgo,0)) * torque_at_1
-            # if CS.out.vEgo > 5: 
-            if torque < 0: #send acc_go when torque is > 0 again
-              self.go_sent = 0
-            elif CS.out.vEgo > CC.hudControl.setSpeed * 0.9 and torque > 0: 
-              torque /= 2.5
-            elif CS.out.vEgo < 5.3 and self.accel > 0:
+            if CS.out.vEgo < 5.3 and self.accel > 0:
               torque = max(15,((self.accel) * torque_at_1)*3)
-              max_gear = 2
+            else: torque = (self.accel- max(CS.out.aEgo,0)) * torque_at_1
+            # if CS.out.vEgo > 5: 
+            # if torque < 0: #send acc_go when torque is > 0 again
+            #   self.go_sent = 0
+            if CS.out.vEgo > CC.hudControl.setSpeed * 0.9 and torque > 0: 
+              torque /= 2
               
             elif CS.out.vEgo > 9 and torque > 0:
               torque *= 0.8
