@@ -133,7 +133,7 @@ class CarController:
             decel_req = False
             torque = None
             if CS.out.vEgo > 1:
-              decel = self.accel * 1.2
+              decel = self.accel * 1.1
             else: decel = self.accel
             max_gear = 8
             self.go_sent = 0
@@ -154,15 +154,16 @@ class CarController:
             max_torque = 38
             
             decel_req = False
-            
+            max_gear = 9
             torque = (self.accel- max(CS.out.aEgo,0)) * torque_at_1
             # if CS.out.vEgo > 5: 
             if torque < 0: #send acc_go when torque is > 0 again
               self.go_sent = 0
             elif CS.out.vEgo > CC.hudControl.setSpeed * 0.9 and torque > 0: 
-              torque /= 3
+              torque /= 2.5
             elif CS.out.vEgo < 5.3 and self.accel > 0:
               torque = max(15,((self.accel) * torque_at_1)*3)
+              max_gear = 2
               
             elif CS.out.vEgo > 9 and torque > 0:
               torque *= 0.8
@@ -175,14 +176,14 @@ class CarController:
               #self.go_sent +=1
             else: accel_req = 0
             if CS.engineTorque < 0 and torque > 0:
-              torque = 10
+              torque = 14
             else:
               torque += CS.engineTorque
               torque = max(round(torque,2), 0) #Min total engine torque requested 
             decel = None
             
             
-          max_gear = 9
+          
           override_request = CS.out.brakePressed or not CS.longEnabled or not CS.out.cruiseState.enabled
           if override_request:
             decel_req = None
@@ -199,7 +200,7 @@ class CarController:
                               CS.longEnabled,
                               accel_req,
                               torque,
-                              9,
+                              max_gear,
                               decel_req,
                               decel,
                               0, 1))
@@ -208,7 +209,7 @@ class CarController:
                               CS.longEnabled,
                               accel_req,
                               torque,
-                              9,
+                              max_gear,
                               decel_req,
                               decel,
                               0,1))

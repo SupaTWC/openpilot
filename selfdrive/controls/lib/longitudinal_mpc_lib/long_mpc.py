@@ -55,7 +55,7 @@ MIN_ACCEL = -3.5
 MAX_ACCEL = 2.0
 T_FOLLOW = 1.25
 COMFORT_BRAKE = 2.5
-STOP_DISTANCE = 8.0
+STOP_DISTANCE = 6.5
 
 def get_stopped_equivalence_factor(v_lead):
   return (v_lead**2) / (2 * COMFORT_BRAKE)
