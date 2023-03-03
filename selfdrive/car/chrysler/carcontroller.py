@@ -155,9 +155,9 @@ class CarController:
             
             decel_req = False
             max_gear = 9
-            if CS.out.vEgo < 1 and self.accel > 0:
+            if CS.out.vEgo < 0.1 and self.accel > 0:
               torque = max(15,((self.accel) * torque_at_1)*1)
-            # elif CS.out.vEgo < 3 and self.accel > 0: 
+            # elif CS.out.vEgo < 0.2 and self.accel > 0: 
             #   torque = ((self.accel) * torque_at_1)*1
             # elif CS.out.vEgo < 5.3 and self.accel > 0: 
             #   torque = ((self.accel) * torque_at_1)*1
@@ -166,10 +166,11 @@ class CarController:
             # if torque < 0: #send acc_go when torque is > 0 again
             #   self.go_sent = 0
             if CS.out.vEgo > CC.hudControl.setSpeed * 0.9 and torque > 0: 
-              torque /= 2
-              
+              torque *=0.4
+            elif CS.out.vEgo > 16 and torque > 0:
+              torque *= 0.55  
             elif CS.out.vEgo > 9 and torque > 0:
-              torque *= 0.8
+              torque *= 0.7
 
             torque = clip(torque,-max_torque, max_torque)
             # if (self.go_sent < 10 and self.accel >0):
@@ -308,7 +309,7 @@ class CarController:
                               0,1))
           can_sends.append(create_acc_1_message(self.packer, 0, self.frame / 2, self.accel_active, self.trq_val))
           can_sends.append(create_acc_1_message(self.packer, 2, self.frame / 2, self.accel_active, self.trq_val))
-#COMMON COMMANDS for Pacifica/Jeep
+#COMMON LONG COMMANDS for Pacifica/Jeep
         if self.frame % 6 == 0:
           state = 0
           if CS.out.cruiseState.available:
