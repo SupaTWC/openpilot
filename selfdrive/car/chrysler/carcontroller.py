@@ -102,8 +102,9 @@ class CarController:
       elif CS.out.vEgo > self.CP.minSteerSpeed:
         lkas_control_bit = True
       elif self.CP.carFingerprint in (CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020, CAR.JEEP_CHEROKEE_2019):
-        if CS.out.vEgo < (self.CP.minSteerSpeed - 3.0):
-          lkas_control_bit = False
+        lkas_control_bit = CC.enabled
+        # if CS.out.vEgo < (self.CP.minSteerSpeed - 3.0):
+        #   lkas_control_bit = False
       elif self.CP.carFingerprint in RAM_HD:
         if CS.out.vEgo < (self.CP.minSteerSpeed - 0.5):
           lkas_control_bit = False
