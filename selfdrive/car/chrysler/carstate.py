@@ -32,6 +32,7 @@ class CarState(CarStateBase):
     self.engineRpm = None
     self.torqMin = None
     self.torqMax = None
+    self.brakeFault = False
 
     if CP.carFingerprint in RAM_CARS:
       self.shifter_values = can_define.dv["Transmission_Status"]["Gear_State"]

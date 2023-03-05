@@ -129,17 +129,18 @@ class CarController:
         if self.CP.carFingerprint not in PAC_HYBRID:
           self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
     
-          if CC.actuators.accel < -0.05: #- self.op_params.get('brake_threshold'):
+          if self.accel < -0.05: #- self.op_params.get('brake_threshold'):
             accel_req = False
             decel_req = False
             torque = None
             if CS.out.vEgo > 1:
               decel = self.accel * 1.1
             else: decel = self.accel
-            max_gear = 8
+            max_gear = 9
             self.go_sent = 0
             self.resume_pressed = 0
-
+            if self.accel < -0.8 and CS.out.brakePressed < 1:
+              CS.brakeFault = True
             
           elif CS.out.gasPressed:
             accel_req = False
