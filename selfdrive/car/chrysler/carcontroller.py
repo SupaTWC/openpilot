@@ -42,7 +42,10 @@ class CarController:
     self.resume_pressed = 0
     self.button_frame = 0
     self.last_button_frame = 0
+    self.carStandstill = False
     self.op_params = opParams()
+    self.go_req = False
+    self.stop_req = False
 
     #hybrid long
     self.accel_lim_prev = 0.
@@ -52,6 +55,8 @@ class CarController:
     self.decel_active = False
     self.go_req = False    
     self.stop_req = False
+    self.decel_val_prev = 0.
+    self.done = False
 
   def update(self, CC, CS):
     can_sends = []
@@ -102,9 +107,9 @@ class CarController:
       elif CS.out.vEgo > self.CP.minSteerSpeed:
         lkas_control_bit = True
       elif self.CP.carFingerprint in (CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020, CAR.JEEP_CHEROKEE_2019):
-        lkas_control_bit = CC.enabled
-        # if CS.out.vEgo < (self.CP.minSteerSpeed - 3.0):
-        #   lkas_control_bit = False
+        # lkas_control_bit = CC.enabled
+        if CS.out.vEgo < (self.CP.minSteerSpeed - 3.0):
+          lkas_control_bit = False
       elif self.CP.carFingerprint in RAM_HD:
         if CS.out.vEgo < (self.CP.minSteerSpeed - 0.5):
           lkas_control_bit = False
