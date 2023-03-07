@@ -130,6 +130,8 @@ class CarController:
 
       can_sends.append(create_lkas_command(self.packer, self.CP, int(apply_steer), lkas_control_bit))
       #LONG
+      brakePrep = CC.hudControl.leadVisible
+      carStandstill = CS.out.vEgo < 0.001
       if self.CP.carFingerprint not in RAM_CARS: #placeholder for oplong enabled
         if self.CP.carFingerprint not in PAC_HYBRID:
           self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
@@ -144,7 +146,7 @@ class CarController:
             max_gear = 9
             self.go_sent = 0
             self.resume_pressed = 0
-            if self.accel < -0.8 and CS.out.brakePressed < 1:
+            if self.accel < -0.8 and not CS.out.brakePressed:
               CS.brakeFault = True
             
           elif CS.out.gasPressed:
@@ -157,18 +159,18 @@ class CarController:
             self.resume_pressed = 0
 
           else:
-            torque_at_1 = 25 #at accel == 1.0
+            torque_at_1 = 15 #at accel == 1.0
             max_torque = 38
             
             decel_req = False
             max_gear = 9
-            if CS.out.vEgo < 0.1 and self.accel > 0:
-              torque = max(15,((self.accel) * torque_at_1)*1)
+            # if CS.out.vEgo < 0.1 and self.accel > 0:
+            torque = (self.accel) * torque_at_1
             # elif CS.out.vEgo < 0.2 and self.accel > 0: 
             #   torque = ((self.accel) * torque_at_1)*1
             # elif CS.out.vEgo < 5.3 and self.accel > 0: 
             #   torque = ((self.accel) * torque_at_1)*1
-            else: torque = (self.accel- max(CS.out.aEgo,0)) * torque_at_1
+            #else: torque = (self.accel- max(CS.out.aEgo,0)) * torque_at_1
             # if CS.out.vEgo > 5: 
             # if torque < 0: #send acc_go when torque is > 0 again
             #   self.go_sent = 0
@@ -204,6 +206,7 @@ class CarController:
             decel = 4
             self.go_sent = 0
             self.resume_pressed = 0
+            brakePrep = False
 
             
           can_sends.append(acc_command(self.packer, self.frame / 2, 0,
@@ -213,7 +216,7 @@ class CarController:
                               torque,
                               max_gear,
                               decel_req,
-                              decel,
+                              decel,brakePrep,
                               0, 1))
           can_sends.append(acc_command(self.packer, self.frame / 2, 2,
                               CS.out.cruiseState.available,
@@ -222,7 +225,7 @@ class CarController:
                               torque,
                               max_gear,
                               decel_req,
-                              decel,
+                              decel,brakePrep,
                               0,1))
           can_sends.append(create_acc_1_message(self.packer, 0, self.frame / 2))
           can_sends.append(create_acc_1_message(self.packer, 2, self.frame / 2))
@@ -242,13 +245,13 @@ class CarController:
 
           accmaxBp = [20, 30, 50]
           accmaxhyb = [ACCEL_MAX, 1., .5]
-          hybridStandstill = CS.out.vEgo < 0.001
-          if long_stopping and hybridStandstill and not CS.out.gasPressed:
+          
+          if long_stopping and carStandstill and not CS.out.gasPressed:
             self.stop_req = True
           else:
             self.stop_req = False
 
-          if not self.stop_req and hybridStandstill and CS.longEnabled:
+          if not self.stop_req and carStandstill and CS.longEnabled:
             self.go_req = True
           else:
             self.go_req = False
@@ -259,7 +262,7 @@ class CarController:
           apply_accel = clip(apply_accel * ACCEL_SCALE, ACCEL_MIN, accel_max_tbl)
 
           self.accel_lim = apply_accel
-          apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev, hybridStandstill)
+          apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev, carStandstill)
 
           if CS.longEnabled and not CS.out.gasPressed and not self.go_req and\
                   (self.stop_req
@@ -269,7 +272,7 @@ class CarController:
             self.decel_active = True
             self.decel_val = apply_accel
             if self.decel_val_prev > self.decel_val and not self.done:
-              self.decel_val = accel_rate_limit(self.decel_val, self.decel_val_prev, hybridStandstill)
+              self.decel_val = accel_rate_limit(self.decel_val, self.decel_val_prev, carStandstill)
               self.accel = self.decel_val
             else:
               self.done = True
@@ -280,7 +283,7 @@ class CarController:
             self.done = False
             self.decel_val_prev = CS.out.aEgo
 
-          if CS.longEnabled and not CS.out.brakePressed and not (hybridStandstill and (self.stop_req or self.decel_active)) and\
+          if CS.longEnabled and not CS.out.brakePressed and not (carStandstill and (self.stop_req or self.decel_active)) and\
                   (apply_accel >= max(START_GAS_THRESHOLD, (20 + 20.)/ACCEL_TO_NM)
                   or self.accel_active and not self.decel_active and apply_accel > (20 - 20.)/ACCEL_TO_NM):
             self.trq_val = apply_accel * ACCEL_TO_NM
@@ -293,6 +296,7 @@ class CarController:
               self.accel_active = False
           else:
             self.accel_active = False
+            brakePrep = False
 
           torque = 1547.75
           self.enabled_prev = CS.longEnabled
@@ -303,7 +307,7 @@ class CarController:
                               torque,
                               0,
                               self.decel_active,
-                              self.decel_val,
+                              self.decel_val, brakePrep,
                               0, 1))
           can_sends.append(acc_command(self.packer, self.frame / 2, 2,
                               CS.out.cruiseState.available,
@@ -312,7 +316,7 @@ class CarController:
                               torque,
                               0,
                               self.decel_active,
-                              self.decel_val,
+                              self.decel_val, brakePrep,
                               0,1))
           can_sends.append(create_acc_1_message(self.packer, 0, self.frame / 2, self.accel_active, self.trq_val))
           can_sends.append(create_acc_1_message(self.packer, 2, self.frame / 2, self.accel_active, self.trq_val))
@@ -338,7 +342,7 @@ class CarController:
       if CS.lkas_car_model != -1:
         can_sends.append(create_lkas_hud(self.packer, self.CP, lkas_active, CC.hudControl.visualAlert, self.hud_count, CS.lkas_car_model, CS))
         self.hud_count += 1
-
+    
     #resume button control
     # if (CS.out.vEgo < 0.6 and self.accel > 0.1):
 
@@ -353,12 +357,13 @@ class CarController:
       self.last_button_frame = button_counter
       self.button_frame += 1
       button_counter_offset = 1
-      if (CS.out.vEgo < 0.01 and CS.accBrakePressed):
+      if (CS.longEnabled and carStandstill):
+      #if (CS.out.vEgo < 0.01 and CS.accBrakePressed):
         button_counter_offset = [1, 1, 0, None][self.button_frame % 4]
         if button_counter_offset is not None:
           # can_sends.append(create_wheel_buttons_command(self.packer, 0, CS.button_counter + button_counter_offset, "ACC_Resume"))
           can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+button_counter_offset, 0, CS.cruise_buttons, resume=True))
-
+    
     self.frame += 1
 
     new_actuators = CC.actuators.copy()
