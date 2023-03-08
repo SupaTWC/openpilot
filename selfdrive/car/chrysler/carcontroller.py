@@ -106,7 +106,7 @@ class CarController:
         if (self.CP.minEnableSpeed >= 14.5)  and (CS.out.gearShifter != GearShifter.drive) :
           lkas_control_bit = False
       elif CS.out.vEgo > self.CP.minSteerSpeed:
-        lkas_control_bit brake= True
+        lkas_control_bit = True
       elif self.CP.carFingerprint in (CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020, CAR.JEEP_CHEROKEE_2019):
         # lkas_control_bit = CC.enabled
         if CS.out.vEgo < (self.CP.minSteerSpeed - 3.0):
