@@ -60,7 +60,7 @@ class CarController:
 
   def update(self, CC, CS):
     can_sends = []
-    carStandstill = CS.out.vEgo < 0.001
+    carStandstill = CS.out.vEgo < 0.001brake
     if self.CP.carFingerprint in RAM_CARS:
       lkas_active = CC.latActive and not CS.lkasdisabled
     else: lkas_active = CC.latActive and self.lkas_control_bit_prev and CC.enabled
@@ -106,7 +106,7 @@ class CarController:
         if (self.CP.minEnableSpeed >= 14.5)  and (CS.out.gearShifter != GearShifter.drive) :
           lkas_control_bit = False
       elif CS.out.vEgo > self.CP.minSteerSpeed:
-        lkas_control_bit = True
+        lkas_control_bit brake= True
       elif self.CP.carFingerprint in (CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020, CAR.JEEP_CHEROKEE_2019):
         # lkas_control_bit = CC.enabled
         if CS.out.vEgo < (self.CP.minSteerSpeed - 3.0):
@@ -146,8 +146,8 @@ class CarController:
             max_gear = 9
             self.go_sent = 0
             self.resume_pressed = 0
-            if self.accel < -0.8 and not CS.out.brakePressed:
-              CS.brakeFault = True
+            # if self.accel < -0.8 and not CS.out.brakePressed:
+            #   CS.brakeFault = True
             
           elif CS.out.gasPressed:
             accel_req = False
