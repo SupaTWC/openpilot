@@ -60,7 +60,7 @@ class CarController:
 
   def update(self, CC, CS):
     can_sends = []
-    carStandstill = CS.out.vEgo < 0.001brake
+    carStandstill = CS.out.vEgo < 0.001
     if self.CP.carFingerprint in RAM_CARS:
       lkas_active = CC.latActive and not CS.lkasdisabled
     else: lkas_active = CC.latActive and self.lkas_control_bit_prev and CC.enabled
