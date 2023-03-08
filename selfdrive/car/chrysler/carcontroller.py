@@ -60,6 +60,7 @@ class CarController:
 
   def update(self, CC, CS):
     can_sends = []
+    carStandstill = CS.out.vEgo < 0.001
     if self.CP.carFingerprint in RAM_CARS:
       lkas_active = CC.latActive and not CS.lkasdisabled
     else: lkas_active = CC.latActive and self.lkas_control_bit_prev and CC.enabled
@@ -131,7 +132,6 @@ class CarController:
       can_sends.append(create_lkas_command(self.packer, self.CP, int(apply_steer), lkas_control_bit))
       #LONG
       brakePrep = CC.hudControl.leadVisible
-      carStandstill = CS.out.vEgo < 0.001
       if self.CP.carFingerprint not in RAM_CARS: #placeholder for oplong enabled
         if self.CP.carFingerprint not in PAC_HYBRID:
           self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
