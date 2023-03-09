@@ -146,8 +146,8 @@ class CarController:
             max_gear = 9
             self.go_sent = 0
             self.resume_pressed = 0
-            # if self.accel < -0.8 and not CS.out.brakePressed:
-            #   CS.brakeFault = True
+            if self.accel < -0.8 and not CS.out.accbrakePressed:
+              CS.brakeFault = True
             
           elif CS.out.gasPressed:
             accel_req = False
