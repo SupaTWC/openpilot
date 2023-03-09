@@ -125,7 +125,7 @@ class CarInterface(CarInterfaceBase):
       raise ValueError(f"Unsupported car: {candidate}")
 
     ret.centerToFront = ret.wheelbase * 0.44
-    ret.enablehybridEcu = 655 in fingerprint[0] or 291 in fingerprint[0]
+    #self.enablehybridEcu = 655 in fingerprint[0] or 291 in fingerprint[0]
 
     # starting with reasonable value for civic and scaling by mass and wheelbase
     ret.rotationalInertia = scale_rot_inertia(ret.mass, ret.wheelbase)
