@@ -146,7 +146,7 @@ class CarController:
             max_gear = 9
             self.go_sent = 0
             self.resume_pressed = 0
-            if self.accel < -0.8 and not CS.out.accbrakePressed:
+            if self.accel < -0.8 and not CS.out.accBrakePressed:
               CS.brakeFault = True
             
           elif CS.out.gasPressed:
@@ -346,7 +346,7 @@ class CarController:
     #resume button control
     # if (CS.out.vEgo < 0.6 and self.accel > 0.1):
 
-    #   #if self.accel > 0 and (CS.out.vEgo < 0.1 or CS.accBrakePressed):
+    #   #if self.accel > 0 and (CS.out.vEgo < 0.1 or CS.out.accBrakePressed):
     #   if CS.button_counter % 6 == 0:
     #     if (CS.button_counter != self.last_button_frame):
     #       self.last_button_frame = CS.button_counter
@@ -358,7 +358,7 @@ class CarController:
       self.button_frame += 1
       button_counter_offset = 1
       
-      #if (CS.out.vEgo < 0.01 and CS.accBrakePressed): #this works 50%
+      #if (CS.out.vEgo < 0.01 and CS.out.accBrakePressed): #this works 50%
       if (CS.longEnabled and carStandstill): #haven't gotten this to work 
         button_counter_offset = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, None, None][self.button_frame % 16]
         if button_counter_offset is not None:
