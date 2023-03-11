@@ -187,7 +187,7 @@ class CarController:
             if torque>3:
               accel_req = 1 
               #self.go_sent +=1
-            else: accel_req = 0
+            else: accel_req = False
             if CS.engineTorque < 0 and torque > 0:
               torque = 14
             else:
@@ -359,7 +359,7 @@ class CarController:
       button_counter_offset = 1
       
       #if (CS.out.vEgo < 0.01 and CS.accBrakePressed): #this works 50%
-      if (CS.longEnabled and carStandstill): #haven't gotten this to work 
+      if (CS.longEnabled and carStandstill and self.accel > 0): #haven't gotten this to work 
         button_counter_offset = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, None, None, None, None, None][self.button_frame % 14]
         if button_counter_offset is not None:
           can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+button_counter_offset, 0, CS.cruise_buttons, resume=True))
