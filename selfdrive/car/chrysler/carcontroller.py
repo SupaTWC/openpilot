@@ -39,6 +39,7 @@ class CarController:
     # long
     self.go_sent = 0
     self.accel = 0
+    self.accel_prev = 0
     self.resume_pressed = 0
     self.button_frame = 0
     self.last_button_frame = 0
@@ -135,7 +136,7 @@ class CarController:
       if self.CP.carFingerprint not in RAM_CARS: #placeholder for oplong enabled
         if self.CP.carFingerprint not in PAC_HYBRID:
           self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
-    
+          
           if self.accel < -0.05: #- self.op_params.get('brake_threshold'):
             accel_req = False
             decel_req = False
@@ -164,24 +165,18 @@ class CarController:
             
             decel_req = False
             max_gear = 9
-            # if CS.out.vEgo < 0.1 and self.accel > 0:
-            torque = (self.accel) * torque_at_1
-            # elif CS.out.vEgo < 0.2 and self.accel > 0: 
-            #   torque = ((self.accel) * torque_at_1)*1
-            # elif CS.out.vEgo < 5.3 and self.accel > 0: 
-            #   torque = ((self.accel) * torque_at_1)*1
-            #else: torque = (self.accel- max(CS.out.aEgo,0)) * torque_at_1
-            # if CS.out.vEgo > 5: 
-            # if torque < 0: #send acc_go when torque is > 0 again
-            #   self.go_sent = 0
-            if CS.out.vEgo > 2 and self.accel > 0 and self.accel < 0.3:
-              torque = -1
-            elif CS.out.vEgo > CC.hudControl.setSpeed * 0.95 and torque > 0: 
-              torque *=0.2
-            elif CS.out.vEgo > 16 and torque > 0:
-              torque *= 0.4  
-            elif CS.out.vEgo > 9 and torque > 0:
-              torque *= 0.7
+            if self.accel > self.accel_prev:
+              torque = (self.accel) * torque_at_1
+              # if CS.out.vEgo > 2 and self.accel > 0 and self.accel < 0.3: #try engine braking
+              #   torque = -1
+              if CS.out.vEgo > CC.hudControl.setSpeed * 0.95 and torque > 0: 
+                torque *=0.2
+              elif CS.out.vEgo > 16 and torque > 0:
+                torque *= 0.4  
+              elif CS.out.vEgo > 9 and torque > 0:
+                torque *= 0.7
+            else: torque = -0.5
+
 
 
             torque = clip(torque,-10, max_torque)
@@ -211,7 +206,7 @@ class CarController:
             self.resume_pressed = 0
             brakePrep = False
 
-            
+          self.accel_prev = self.accel
           can_sends.append(acc_command(self.packer, self.frame / 2, 0,
                               CS.out.cruiseState.available,
                               CS.longEnabled,
