@@ -174,12 +174,15 @@ class CarController:
             # if CS.out.vEgo > 5: 
             # if torque < 0: #send acc_go when torque is > 0 again
             #   self.go_sent = 0
-            if CS.out.vEgo > CC.hudControl.setSpeed * 0.95 and torque > 0: 
+            if CS.out.vEgo > 2 and self.accel > 0 and self.accel < 0.3:
+              torque = -1
+            elif CS.out.vEgo > CC.hudControl.setSpeed * 0.95 and torque > 0: 
               torque *=0.2
             elif CS.out.vEgo > 16 and torque > 0:
               torque *= 0.4  
             elif CS.out.vEgo > 9 and torque > 0:
               torque *= 0.7
+
 
             torque = clip(torque,-10, max_torque)
             # if (self.go_sent < 10 and self.accel >0):
@@ -192,7 +195,7 @@ class CarController:
               torque = 14
             else:
               torque += CS.engineTorque
-              torque = max(round(torque,2), -1) #Min total engine torque requested 
+              torque = max(round(torque,2), -10) #Min total engine torque requested 
             decel = None
             
             
