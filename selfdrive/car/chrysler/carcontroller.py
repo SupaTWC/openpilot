@@ -360,7 +360,7 @@ class CarController:
       
       #if (CS.out.vEgo < 0.01 and CS.accBrakePressed): #this works 50%
       if (CS.longEnabled and carStandstill): #haven't gotten this to work 
-        button_counter_offset = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, None, None][self.button_frame % 16]
+        button_counter_offset = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, None, None, None, None, None][self.button_frame % 14]
         if button_counter_offset is not None:
           can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+button_counter_offset, 0, CS.cruise_buttons, resume=True))
     
