@@ -184,7 +184,7 @@ class CarController:
 
             if CS.out.vEgo > 3: 
               torque = clip(torque,-10, max_torque)
-            else: torque = clip(torque, 0, max_torque)
+            else: torque = clip(torque, 0, max_torque) #no negative during stop and go situation
             # if (self.go_sent < 10 and self.accel >0):
             #if torque > 0 and (CS.out.vEgo < 0.1 or self.go_sent < 10):
             if torque>2:
@@ -210,8 +210,8 @@ class CarController:
             self.go_sent = 0
             self.resume_pressed = 0
             brakePrep = False
-          # if self.accel < -0.8 and not CS.accBrakePressed:
-          #     CS.brakeFault = True
+          if self.accel < -0.7 and not CS.accBrakePressed:
+              CS.brakeFault = True
           # if carStandstill: 
           #   self.accel_req = 1
           #   torque = 15

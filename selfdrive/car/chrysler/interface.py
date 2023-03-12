@@ -162,8 +162,8 @@ class CarInterface(CarInterfaceBase):
         self.low_speed_alert = False
     if self.low_speed_alert:
       events.add(car.CarEvent.EventName.belowSteerSpeed)
-    if self.CS.brakeFault:
-      events.add(car.CarEvent.EventName.brakeUnavailable)
+    # if self.CS.brakeFault:
+    #   events.add(car.CarEvent.EventName.brakeUnavailable)
 
     ret.events = events.to_msg()
 
