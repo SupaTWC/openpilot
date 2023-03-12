@@ -47,6 +47,7 @@ class CarController:
     self.op_params = opParams()
     self.go_req = False
     self.stop_req = False
+    self.accel_req = False
 
     #hybrid long
     self.accel_lim_prev = 0.
@@ -138,7 +139,7 @@ class CarController:
           self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
           
           if self.accel < -0.05: #brake_threshold
-            accel_req = False
+            self.accel_req = False
             decel_req = False
             torque = None
             if CS.out.vEgo > 1:
@@ -147,11 +148,11 @@ class CarController:
             max_gear = 9
             self.go_sent = 0
             self.resume_pressed = 0
-            if self.accel < -0.8 and not CS.accBrakePressed:
-              CS.brakeFault = True
+            
+            
             
           elif CS.out.gasPressed:
-            accel_req = False
+            self.accel_req = False
             decel_req = False
             torque = CS.engineTorque
             decel = None
@@ -160,7 +161,7 @@ class CarController:
             self.resume_pressed = 0
 
           else:
-            torque_at_1 = 15 #at accel == 1.0
+            torque_at_1 = 25 #at accel == 1.0
             max_torque = 38
             
             decel_req = False
@@ -176,19 +177,21 @@ class CarController:
                 elif CS.out.vEgo > 16 and torque > 0:
                   torque *= 0.4  
                 elif CS.out.vEgo > 9 and torque > 0:
-                  torque *= 0.7
+                  torque *= 0.6
               else: torque = -0.5
 
 
 
-            torque = clip(torque,-10, max_torque)
+            if CS.out.vEgo > 3: 
+              torque = clip(torque,-10, max_torque)
+            else: torque = clip(torque, 0, max_torque)
             # if (self.go_sent < 10 and self.accel >0):
             #if torque > 0 and (CS.out.vEgo < 0.1 or self.go_sent < 10):
-            if torque>3:
-              accel_req = 1 
+            if torque>2:
+              self.accel_req = 1 
               #self.go_sent +=1
-            else: accel_req = False
-            if CS.engineTorque < 0 and torque > 0:
+            else: self.accel_req = False
+            if CS.engineTorque < 0 and torque >= 0:
               torque = 14
             else:
               torque += CS.engineTorque
@@ -200,19 +203,23 @@ class CarController:
           override_request = CS.out.brakePressed or not CS.longEnabled or not CS.out.cruiseState.enabled
           if override_request:
             decel_req = None
-            accel_req = 0
+            self.accel_req = 0
             torque = None
             max_gear = 9
             decel = 4
             self.go_sent = 0
             self.resume_pressed = 0
             brakePrep = False
-
+          # if self.accel < -0.8 and not CS.accBrakePressed:
+          #     CS.brakeFault = True
+          # if carStandstill: 
+          #   self.accel_req = 1
+          #   torque = 15
           self.accel_prev = self.accel
           can_sends.append(acc_command(self.packer, self.frame / 2, 0,
                               CS.out.cruiseState.available,
                               CS.longEnabled,
-                              accel_req,
+                              self.accel_req,
                               torque,
                               max_gear,
                               decel_req,
@@ -221,7 +228,7 @@ class CarController:
           can_sends.append(acc_command(self.packer, self.frame / 2, 2,
                               CS.out.cruiseState.available,
                               CS.longEnabled,
-                              accel_req,
+                              self.accel_req,
                               torque,
                               max_gear,
                               decel_req,
@@ -359,8 +366,9 @@ class CarController:
       button_counter_offset = 1
       
       #if (CS.out.vEgo < 0.01 and CS.accBrakePressed): #this works 50%
-      if (CS.longEnabled and carStandstill and self.accel > 0): #haven't gotten this to work 
-        button_counter_offset = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, None, None, None, None, None][self.button_frame % 14]
+      if self.accel_req == 1 and carStandstill: #haven't gotten this to work 
+        #button_counter_offset = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, None, None, None, None, None][self.button_frame % 14]
+        button_counter_offset = [1, 1, 0, None][self.button_frame % 4]
         if button_counter_offset is not None:
           can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+button_counter_offset, 0, CS.cruise_buttons, resume=True))
     
