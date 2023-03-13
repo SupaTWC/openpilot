@@ -32,7 +32,7 @@ def create_lkas_hud(packer, CP, lkas_active, hud_alert, hud_count, car_model, CS
   lines = 3 if lkas_active else 0
   alerts = 7 if lkas_active else 0
   if CS.brakeFault: 
-    lines = "0E"
+    #lines = "0E"
     color = 3
 
   if hud_count < (1 * 4):  # first 3 seconds, 4Hz
