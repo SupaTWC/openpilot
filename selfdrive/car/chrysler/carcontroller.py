@@ -170,19 +170,20 @@ class CarController:
             decel_req = False
             max_gear = 9
             torque = (self.accel) * torque_at_1
-            if self.accel > 0: #account for accel < 0 and > brake_threshold
+            if self.accel > 0.2: #account for accel < 0 and > brake_threshold
               if self.accel >= self.accel_prev:
               
                 # if CS.out.vEgo > 2 and self.accel > 0 and self.accel < 0.3: #try engine braking
                 #   torque = -1
-                if CS.out.vEgo > CC.hudControl.setSpeed * 0.95 and torque > 0: 
+                if CS.out.vEgo > CC.hudControl.setSpeed -5 and torque > 0: 
                   torque *=0.3
                 elif CS.out.vEgo > 16 and torque > 0:
                   torque *= 0.4  
                 elif CS.out.vEgo > 9 and torque > 0:
                   torque *= 0.4
-                else: torque *= 1.5
-              else: torque = -0.5
+                else: torque *= 1.8
+              else: torque = -1
+            else: torque = -2
 
 
 
@@ -195,7 +196,7 @@ class CarController:
               self.accel_req = 1 
               #self.go_sent +=1
             else: self.accel_req = False
-            if carStandstill or (CS.engineTorque < 0 and torque >= 0):
+            if CS.accBrakePressed or (CS.engineTorque < 0 and torque >= 0):
               torque = 15
             else:
               torque += CS.engineTorque
@@ -372,7 +373,7 @@ class CarController:
       #if (CS.out.vEgo < 0.01 and CS.accBrakePressed): #this works 50%
       if self.accel_req == 1 and CS.accBrakePressed: #haven't gotten this to work 
         #button_counter_offset = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, None, None, None, None, None][self.button_frame % 14]
-        button_counter_offset = [1, 1, 1, 1, 1, 1, None, None, 1, 1, 1, 1, 1, 1, 1, 1, 1][self.button_frame % 11]
+        button_counter_offset = [1, 1, 1, 1, 1, 1, None, None, None, 1, 1, 1, 1, 1, 1, 1, 1][self.button_frame % 10]
         if button_counter_offset is not None:
           can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+button_counter_offset, 0, CS.cruise_buttons, resume=True))
     
