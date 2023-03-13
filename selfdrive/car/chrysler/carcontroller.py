@@ -138,12 +138,15 @@ class CarController:
         if self.CP.carFingerprint not in PAC_HYBRID:
           self.accel = clip(CC.actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX)
           
-          if self.accel < -0.05: #brake_threshold
+          if self.accel < -0.02: #brake_threshold
             self.accel_req = False
             decel_req = False
             torque = None
             if CS.out.vEgo > 1:
-              decel = self.accel * 1.1
+              if self.accel >-0.3:
+                decel = self.accel * 1.5
+              else:
+                decel = self.accel * 1.1
             else: decel = self.accel
             max_gear = 9
             self.go_sent = 0
@@ -178,6 +181,7 @@ class CarController:
                   torque *= 0.4  
                 elif CS.out.vEgo > 9 and torque > 0:
                   torque *= 0.4
+                else: torque *= 1.5
               else: torque = -0.5
 
 
@@ -191,8 +195,8 @@ class CarController:
               self.accel_req = 1 
               #self.go_sent +=1
             else: self.accel_req = False
-            if CS.engineTorque < 0 and torque >= 0:
-              torque = 14
+            if carStandstill or (CS.engineTorque < 0 and torque >= 0):
+              torque = 15
             else:
               torque += CS.engineTorque
               torque = max(round(torque,2), -10) #Min total engine torque requested 
