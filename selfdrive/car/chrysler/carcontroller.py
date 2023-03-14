@@ -176,7 +176,7 @@ class CarController:
                 # if CS.out.vEgo > 2 and self.accel > 0 and self.accel < 0.3: #try engine braking
                 #   torque = -1
                 if CS.out.vEgo > CC.hudControl.setSpeed -5 and torque > 0: 
-                  torque *=0.3
+                  torque *=0.5
                 elif CS.out.vEgo > 16 and torque > 0:
                   torque *= 0.4  
                 elif CS.out.vEgo > 9 and torque > 0:
@@ -200,7 +200,7 @@ class CarController:
               torque = 15
             else:
               torque += CS.engineTorque
-              torque = max(round(torque,2), -10) #Min total engine torque requested 
+              torque = max(round(torque,2), 0.1) #Min total engine torque requested 
             decel = None
             
             
