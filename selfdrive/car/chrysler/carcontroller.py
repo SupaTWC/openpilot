@@ -145,7 +145,7 @@ class CarController:
             decel_req = False
             torqueReq = None
             #if CS.out.vEgo > 1:
-            decel = min(self.accel, -0.2)
+            decel = min(self.accel, -0.2) #prevent car's own engine braking, make sure brake is applied ASAP
             #else: decel = self.accel
             max_gear = 9
             self.go_sent = 0
