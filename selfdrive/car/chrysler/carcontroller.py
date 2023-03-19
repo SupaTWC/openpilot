@@ -216,8 +216,11 @@ class CarController:
             self.go_sent = 0
             self.resume_pressed = 0
             brakePrep = False
-          if self.accel < -0.7 and not CS.accBrakePressed:
+          if self.accel < -0.5 and not CS.accBrakePressed:
               CS.brakeFault = True
+          elif self.accel < -0.5 and CS.accBrakePressed:
+              CS.brakeFault = False
+
           # if carStandstill: 
           #   self.accel_req = 1
           #   torque = 15
