@@ -48,8 +48,10 @@ class CarController:
     self.go_req = False
     self.stop_req = False
     self.accel_req = False
-    self.prev_torque = 0
+    self.prev_torqueReq = 0
     self.frame_changed = 0
+    self.torque = 0
+    self.faultCounter = 0
 
     #hybrid long
     self.accel_lim_prev = 0.
@@ -150,6 +152,14 @@ class CarController:
             max_gear = 9
             self.go_sent = 0
             self.resume_pressed = 0
+            if self.accel < -0.5 and not CS.accBrakePressed: 
+              self.faultCounter += 1
+              if self.faultCounter > 15:
+                CS.brakeFault = True
+            elif CS.accBrakePressed:
+              CS.brakeFault = False
+              self.faultCounter = 0
+            
             
           elif CS.out.gasPressed:
             self.accel_req = False
@@ -159,48 +169,50 @@ class CarController:
             max_gear = 9
             self.go_sent = 10
             self.resume_pressed = 0
+            self.faultCounter = 0
 
           else:
+            self.faultCounter = 0
             torque_at_1 = 25 #at accel == 1.0
             max_torque = 38
             decel_req = False
+            self.accel_req = False
             if self.frame - self.frame_changed > 1.1: #change every 2 frame
 
-              torque = (self.accel) * torque_at_1
+              self.torque = (self.accel) * torque_at_1
               if self.accel > 0.2: #account for accel < 0 and > brake_threshold
+                
                 if self.accel >= self.accel_prev:
                 
                   # if CS.out.vEgo > 2 and self.accel > 0 and self.accel < 0.3: #try engine braking
                   #   torque = -1
-                  if CS.out.vEgo > CC.hudControl.setSpeed -5 and torque > 0: 
-                    torque *=0.5
-                  elif CS.out.vEgo > 16 and torque > 0:
-                    torque *= 0.4  
-                  elif CS.out.vEgo > 9 and torque > 0:
-                    torque *= 0.4
-                  else: torque *= 1.8
-                else: torque = -1
-              else: torque = -2
+                  if CS.out.vEgo > CC.hudControl.setSpeed -5 and self.torque > 0: 
+                    self.torque *=0.5
+                  elif CS.out.vEgo > 16 and self.torque > 0:
+                    self.torque *= 0.4  
+                  elif CS.out.vEgo > 9 and self.torque > 0:
+                    self.torque *= 0.4
+                  else: self.torque *= 1.8
+                else: self.torque = -1
+              else: self.torque = -2
             
               if CS.out.vEgo > 3: 
-                torque = clip(torque,-5, max_torque)
-              else: torque = clip(torque, 0, max_torque) #no negative during stop and go situation
+                self.torque = clip(self.torque,-5, max_torque)
+              else: self.torque = clip(self.torque, -2, max_torque) #no negative during stop and go situation
               # if (self.go_sent < 10 and self.accel >0):
               #if torque > 0 and (CS.out.vEgo < 0.1 or self.go_sent < 10):
               
-              if CS.accBrakePressed or (CS.engineTorque < 0 and torque >= 0):
+              if (CS.engineTorque < 0 and self.torque >= 0):
                 torqueReq = 15
               else:
                 torqueReq = torque + CS.engineTorque
                 torqueReq = max(round(torqueReq,2), 0.1) #Min total engine torque requested 
               
-              self.prev_torque = torqueReq
+              self.prev_torqueReq = torqueReq
               self.frame_changed = self.frame
-            else: torqueReq = self.prev_torque
-            if torqueReq - CS.engineTorque >2:
+            else: torqueReq = self.prev_torqueReq
+            if torqueReq - CS.engineTorque >2 and self.torque > 0.2:
               self.accel_req = 1 
-              #self.go_sent +=1
-            else: self.accel_req = False
             decel = None
             max_gear = 9
             
@@ -216,10 +228,8 @@ class CarController:
             self.go_sent = 0
             self.resume_pressed = 0
             brakePrep = False
-          if self.accel < -0.5 and not CS.accBrakePressed:
-              CS.brakeFault = True
-          elif self.accel < -0.5 and CS.accBrakePressed:
-              CS.brakeFault = False
+            self.faultCounter = 0
+          
 
           # if carStandstill: 
           #   self.accel_req = 1
