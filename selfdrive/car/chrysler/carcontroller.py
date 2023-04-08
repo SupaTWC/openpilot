@@ -205,7 +205,7 @@ class CarController:
               if (CS.engineTorque < 0 and self.torque >= 0):
                 torqueReq = 15
               else:
-                torqueReq = torque + CS.engineTorque
+                torqueReq = self.torque + CS.engineTorque
                 torqueReq = max(round(torqueReq,2), 0.1) #Min total engine torque requested 
               
               self.prev_torqueReq = torqueReq
