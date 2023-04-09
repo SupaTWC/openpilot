@@ -127,8 +127,8 @@ def create_acc_1_message(packer, bus, frame, eng_req = 0, torq = 25000): #DAS_5
 
 def create_das_4_message(packer, bus, state, speed):
   values = {
-    "ACC_DISTANCE_CONFIG_1": 0x1,
-    "ACC_DISTANCE_CONFIG_2": 0x1,
+    "ACC_DISTANCE_CONFIG_1": 0x2,
+    "ACC_DISTANCE_CONFIG_2": 0x2,
     "SPEED_DIGITAL": 0xFE,
     "ALWAYS_ON": 0x1,
     "ACC_STATE": state,

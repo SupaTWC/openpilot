@@ -192,7 +192,7 @@ class CarController:
                     self.torque *= 0.4  
                   elif CS.out.vEgo > 9 and self.torque > 0:
                     self.torque *= 0.4
-                  else: self.torque *= 1.8
+                  else: self.torque *= 2
                 else: self.torque = -1
               else: self.torque = -2
             
@@ -350,7 +350,7 @@ class CarController:
         if self.frame % 6 == 0:
           state = 0
           if CS.out.cruiseState.available:
-            state = 4 if CS.out.cruiseState.enabled else 3 #1/2 for regular cc, 3/4 for ACC
+            state = 3 if CS.out.cruiseState.enabled else 1 #1/2 for regular cc, 3 for ACC
           can_sends.append(create_das_4_message(self.packer, 0, state, CC.hudControl.setSpeed)) #need to double check setSpeed
           can_sends.append(create_das_4_message(self.packer, 2, state, CC.hudControl.setSpeed))
 
