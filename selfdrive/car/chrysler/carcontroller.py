@@ -192,7 +192,7 @@ class CarController:
                     self.torque *= 0.4  
                   elif CS.out.vEgo > 9 and self.torque > 0:
                     self.torque *= 0.4
-                  else: self.torque *= 2
+                  else: self.torque *= 3
                 else: self.torque = -1
               else: self.torque = -2
             
