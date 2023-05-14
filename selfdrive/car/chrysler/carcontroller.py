@@ -259,7 +259,9 @@ class CarController:
           # if self.frame % 10 == 0:
           #   new_msg = create_lkas_heartbit(self.packer, 0, CS.lkasHeartbit)
           #   can_sends.append(new_msg)
-        elif self.CP.carFingerprint in PAC_HYBRID:
+
+        ########NOT WORKING FOR HYBRID, IGNORE#################
+        elif self.CP.carFingerprint in PAC_HYBRID:  
           ACCEL_TO_NM = 1200
           self.accel_lim_prev = self.accel_lim
           self.decel_val = DEFAULT_DECEL
@@ -350,7 +352,7 @@ class CarController:
         if self.frame % 6 == 0:
           state = 0
           if CS.out.cruiseState.available:
-            state = 3 if CS.out.cruiseState.enabled else 3 #1/2 for regular cc, 3 for ACC
+            state = 4 if CS.out.cruiseState.enabled else 3 #1/2 for regular cc, 3 for ACC
           can_sends.append(create_das_4_message(self.packer, 0, state, CC.hudControl.setSpeed)) #need to double check setSpeed
           can_sends.append(create_das_4_message(self.packer, 2, state, CC.hudControl.setSpeed))
 
