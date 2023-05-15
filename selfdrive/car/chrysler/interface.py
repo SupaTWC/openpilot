@@ -52,7 +52,7 @@ class CarInterface(CarInterfaceBase):
       tune.kiV = [0.05]
       ret.longitudinalActuatorDelayLowerBound = 0.7
       ret.longitudinalActuatorDelayUpperBound = 0.7 # s
-      ret.stoppingDecelRate = 0.3 
+      ret.stoppingDecelRate = 0.8 
       #ret.stoppingControl = True
       ret.startingState = False
       ret.vEgoStarting = 0.5 #default 0.5, hyundai 0.1
@@ -77,7 +77,7 @@ class CarInterface(CarInterfaceBase):
       tune.kiV = [0.0]
       #ret.longitudinalActuatorDelayLowerBound = 0.5
       ret.longitudinalActuatorDelayUpperBound = 0.5 # s
-      ret.stoppingDecelRate = 0.3 
+      ret.stoppingDecelRate = 0.8
       #ret.stoppingControl = True
       ret.startingState = True
       ret.vEgoStarting = 0.3 #default 0.5, hyundai 0.1
@@ -119,7 +119,7 @@ class CarInterface(CarInterfaceBase):
       tune.kpV = [0.25]
       tune.kiV = [0.05]
       ret.longitudinalActuatorDelayUpperBound = 0.5 # s
-      ret.stoppingDecelRate = 0.3  # reach stopping target smoothly
+      ret.stoppingDecelRate = 0.8  # reach stopping target smoothly
 
     else:
       raise ValueError(f"Unsupported car: {candidate}")

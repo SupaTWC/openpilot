@@ -147,7 +147,7 @@ class CarController:
             decel_req = False
             torqueReq = None
             #if CS.out.vEgo > 1:
-            decel = min(self.accel, -0.2) #prevent car's own engine braking, make sure brake is applied ASAP
+            decel = min(self.accel * 1.2, -0.2) #prevent car's own engine braking, make sure brake is applied ASAP
             #else: decel = self.accel
             max_gear = 9
             self.go_sent = 0
@@ -261,100 +261,102 @@ class CarController:
           #   can_sends.append(new_msg)
 
         ########NOT WORKING FOR HYBRID, IGNORE#################
-        elif self.CP.carFingerprint in PAC_HYBRID:  
-          ACCEL_TO_NM = 1200
-          self.accel_lim_prev = self.accel_lim
-          self.decel_val = DEFAULT_DECEL
-          self.trq_val = 20
+        # elif self.CP.carFingerprint in PAC_HYBRID:  
+        #   ACCEL_TO_NM = 1200
+        #   self.accel_lim_prev = self.accel_lim
+        #   self.decel_val = DEFAULT_DECEL
+        #   self.trq_val = 20
 
-          long_stopping = CC.actuators.longControlState == LongCtrlState.stopping
+        #   long_stopping = CC.actuators.longControlState == LongCtrlState.stopping
 
-          apply_accel = CC.actuators.accel if CS.longEnabled else 0
+        #   apply_accel = CC.actuators.accel if CS.longEnabled else 0
 
-          accmaxBp = [20, 30, 50]
-          accmaxhyb = [ACCEL_MAX, 1., .5]
+        #   accmaxBp = [20, 30, 50]
+        #   accmaxhyb = [ACCEL_MAX, 1., .5]
           
-          if long_stopping and carStandstill and not CS.out.gasPressed:
-            self.stop_req = True
-          else:
-            self.stop_req = False
+        #   if long_stopping and carStandstill and not CS.out.gasPressed:
+        #     self.stop_req = True
+        #   else:
+        #     self.stop_req = False
 
-          if not self.stop_req and carStandstill and CS.longEnabled:
-            self.go_req = True
-          else:
-            self.go_req = False
+        #   if not self.stop_req and carStandstill and CS.longEnabled:
+        #     self.go_req = True
+        #   else:
+        #     self.go_req = False
 
-          apply_accel, self.accel_steady = accel_hysteresis(apply_accel, self.accel_steady)
-          accel_max_tbl = interp(1, accmaxBp, accmaxhyb)
+        #   apply_accel, self.accel_steady = accel_hysteresis(apply_accel, self.accel_steady)
+        #   accel_max_tbl = interp(1, accmaxBp, accmaxhyb)
 
-          apply_accel = clip(apply_accel * ACCEL_SCALE, ACCEL_MIN, accel_max_tbl)
+        #   apply_accel = clip(apply_accel * ACCEL_SCALE, ACCEL_MIN, accel_max_tbl)
 
-          self.accel_lim = apply_accel
-          apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev, carStandstill)
+        #   self.accel_lim = apply_accel
+        #   apply_accel = accel_rate_limit(self.accel_lim, self.accel_lim_prev, carStandstill)
 
-          if CS.longEnabled and not CS.out.gasPressed and not self.go_req and\
-                  (self.stop_req
-                  or (apply_accel <= min(20/ACCEL_TO_NM, START_BRAKE_THRESHOLD))
-                  or (self.decel_active and ((CS.out.brake > 10.) or (1 < 0.)) and
-                      (apply_accel < max((20 + 20.)/ACCEL_TO_NM, STOP_BRAKE_THRESHOLD)))):
-            self.decel_active = True
-            self.decel_val = apply_accel
-            if self.decel_val_prev > self.decel_val and not self.done:
-              self.decel_val = accel_rate_limit(self.decel_val, self.decel_val_prev, carStandstill)
-              self.accel = self.decel_val
-            else:
-              self.done = True
+        #   if CS.longEnabled and not CS.out.gasPressed and not self.go_req and\
+        #           (self.stop_req
+        #           or (apply_accel <= min(20/ACCEL_TO_NM, START_BRAKE_THRESHOLD))
+        #           or (self.decel_active and ((CS.out.brake > 10.) or (1 < 0.)) and
+        #               (apply_accel < max((20 + 20.)/ACCEL_TO_NM, STOP_BRAKE_THRESHOLD)))):
+        #     self.decel_active = True
+        #     self.decel_val = apply_accel
+        #     if self.decel_val_prev > self.decel_val and not self.done:
+        #       self.decel_val = accel_rate_limit(self.decel_val, self.decel_val_prev, carStandstill)
+        #       self.accel = self.decel_val
+        #     else:
+        #       self.done = True
 
-            self.decel_val_prev = self.decel_val
-          else:
-            self.decel_active = False
-            self.done = False
-            self.decel_val_prev = CS.out.aEgo
+        #     self.decel_val_prev = self.decel_val
+        #   else:
+        #     self.decel_active = False
+        #     self.done = False
+        #     self.decel_val_prev = CS.out.aEgo
 
-          if CS.longEnabled and not CS.out.brakePressed and not (carStandstill and (self.stop_req or self.decel_active)) and\
-                  (apply_accel >= max(START_GAS_THRESHOLD, (20 + 20.)/ACCEL_TO_NM)
-                  or self.accel_active and not self.decel_active and apply_accel > (20 - 20.)/ACCEL_TO_NM):
-            self.trq_val = apply_accel * ACCEL_TO_NM
-            self.accel = apply_accel
+        #   if CS.longEnabled and not CS.out.brakePressed and not (carStandstill and (self.stop_req or self.decel_active)) and\
+        #           (apply_accel >= max(START_GAS_THRESHOLD, (20 + 20.)/ACCEL_TO_NM)
+        #           or self.accel_active and not self.decel_active and apply_accel > (20 - 20.)/ACCEL_TO_NM):
+        #     self.trq_val = apply_accel * ACCEL_TO_NM
+        #     self.accel = apply_accel
 
-            if 300 > self.trq_val > 20:
-              self.accel_active = True
-            else:
-              self.trq_val = 20
-              self.accel_active = False
-          else:
-            self.accel_active = False
-            brakePrep = False
+        #     if 300 > self.trq_val > 20:
+        #       self.accel_active = True
+        #     else:
+        #       self.trq_val = 20
+        #       self.accel_active = False
+        #   else:
+        #     self.accel_active = False
+        #     brakePrep = False
 
-          torque = 1547.75
-          self.enabled_prev = CS.longEnabled
-          can_sends.append(acc_command(self.packer, self.frame / 2, 0,
-                              CS.out.cruiseState.available,
-                              CS.longEnabled,
-                              self.go_req,
-                              torque,
-                              0,
-                              self.decel_active,
-                              self.decel_val, brakePrep,
-                              0, 1))
-          can_sends.append(acc_command(self.packer, self.frame / 2, 2,
-                              CS.out.cruiseState.available,
-                              CS.longEnabled,
-                              self.go_req,
-                              torque,
-                              0,
-                              self.decel_active,
-                              self.decel_val, brakePrep,
-                              0,1))
-          can_sends.append(create_acc_1_message(self.packer, 0, self.frame / 2, self.accel_active, self.trq_val))
-          can_sends.append(create_acc_1_message(self.packer, 2, self.frame / 2, self.accel_active, self.trq_val))
+        #   torque = 1547.75
+        #   self.enabled_prev = CS.longEnabled
+        #   can_sends.append(acc_command(self.packer, self.frame / 2, 0,
+        #                       CS.out.cruiseState.available,
+        #                       CS.longEnabled,
+        #                       self.go_req,
+        #                       torque,
+        #                       0,
+        #                       self.decel_active,
+        #                       self.decel_val, brakePrep,
+        #                       0, 1))
+        #   can_sends.append(acc_command(self.packer, self.frame / 2, 2,
+        #                       CS.out.cruiseState.available,
+        #                       CS.longEnabled,
+        #                       self.go_req,
+        #                       torque,
+        #                       0,
+        #                       self.decel_active,
+        #                       self.decel_val, brakePrep,
+        #                       0,1))
+        #   can_sends.append(create_acc_1_message(self.packer, 0, self.frame / 2, self.accel_active, self.trq_val))
+        #   can_sends.append(create_acc_1_message(self.packer, 2, self.frame / 2, self.accel_active, self.trq_val))
 #COMMON LONG COMMANDS for Pacifica/Jeep
         if self.frame % 6 == 0:
           state = 0
-          if CS.out.cruiseState.available:
-            state = 4 if CS.out.cruiseState.enabled else 3 #1/2 for regular cc, 3 for ACC
-          can_sends.append(create_das_4_message(self.packer, 0, state, CC.hudControl.setSpeed)) #need to double check setSpeed
-          can_sends.append(create_das_4_message(self.packer, 2, state, CC.hudControl.setSpeed))
+          distance = 1
+          if CS.longAvailable:
+            state = 4 if CS.longEnabled else 3 #1/2 for regular cc, 3/4 for ACC
+            distance = 1 if CS.longEnabled else 3
+          can_sends.append(create_das_4_message(self.packer, 0, state, CC.hudControl.setSpeed, distance)) #need to double check setSpeed
+          can_sends.append(create_das_4_message(self.packer, 2, state, CC.hudControl.setSpeed, distance))
 
         if self.frame % 50 == 0:
           # tester present - w/ no response (keeps radar disabled)

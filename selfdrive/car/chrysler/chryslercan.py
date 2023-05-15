@@ -125,10 +125,10 @@ def create_acc_1_message(packer, bus, frame, eng_req = 0, torq = 25000): #DAS_5
 
   return packer.make_can_msg("ACC_1", bus, values)
 
-def create_das_4_message(packer, bus, state, speed):
+def create_das_4_message(packer, bus, state, speed, distance):
   values = {
-    "ACC_DISTANCE_CONFIG_1": 1 if state == 4 else 3,
-    "ACC_DISTANCE_CONFIG_2": 1 if state == 4 else 3,
+    "ACC_DISTANCE_CONFIG_1": distance,
+    "ACC_DISTANCE_CONFIG_2": distance,
     "SPEED_DIGITAL": 0xFE,
     "ALWAYS_ON": 0x1,
     "ACC_STATE": state,
