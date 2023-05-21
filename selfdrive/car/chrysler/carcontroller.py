@@ -137,6 +137,12 @@ class CarController:
 
       can_sends.append(create_lkas_command(self.packer, self.CP, int(apply_steer), lkas_control_bit))
       #LONG
+      if self.accel_req == 1 and CS.accBrakePressed: #haven't gotten this to work 
+
+        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter, 0, CS.cruise_buttons, resume=True))
+      else:
+        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter, 0, CS.cruise_buttons))
+        
       brakePrep = CC.hudControl.leadVisible
       if self.CP.carFingerprint not in RAM_CARS: #placeholder for oplong enabled
         if self.CP.carFingerprint not in PAC_HYBRID:
@@ -382,18 +388,18 @@ class CarController:
     #       self.last_button_frame = CS.button_counter
     #       can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+1, 0, CS.cruise_buttons, resume=True))
     #jve resume button control
-    button_counter = CS.button_counter
-    if button_counter != self.last_button_frame:
-      self.last_button_frame = button_counter
-      self.button_frame += 1
-      button_counter_offset = 1
+    # button_counter = CS.button_counter
+    # if button_counter != self.last_button_frame:
+    #   self.last_button_frame = button_counter
+    #   self.button_frame += 1
+    #   button_counter_offset = 1
       
-      #if (CS.out.vEgo < 0.01 and CS.accBrakePressed): #this works 50%
-      if self.accel_req == 1 and CS.accBrakePressed: #haven't gotten this to work 
-        #button_counter_offset = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, None, None, None, None, None][self.button_frame % 14]
-        button_counter_offset = [1, 1, 1, 1, 1, 1, None, None, None, 1, 1, 1, 1, 1, 1, 1, 1][self.button_frame % 10]
-        if button_counter_offset is not None:
-          can_sends.append(create_cruise_buttons(self.packer, CS.button_counter+button_counter_offset, 0, CS.cruise_buttons, resume=True))
+    #   #if (CS.out.vEgo < 0.01 and CS.accBrakePressed): #this works 50%
+    #   if self.accel_req == 1 and CS.accBrakePressed: #haven't gotten this to work 
+    #     #button_counter_offset = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, None, None, None, None, None][self.button_frame % 14]
+    #     button_counter_offset = [1, 1, 1, 1, 1, 1, None, None, None, 1, 1, 1, 1, 1, 1, 1, 1][self.button_frame % 10]
+    #     if button_counter_offset is not None:
+    #       can_sends.append(create_cruise_buttons(self.packer, CS.button_counter, 0, CS.cruise_buttons, resume=True))
     
     self.frame += 1
 
