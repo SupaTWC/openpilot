@@ -137,12 +137,8 @@ class CarController:
 
       can_sends.append(create_lkas_command(self.packer, self.CP, int(apply_steer), lkas_control_bit))
       #LONG
-      if self.accel_req == 1 and CS.accBrakePressed: #haven't gotten this to work 
 
-        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter, 0, CS.cruise_buttons, resume=True))
-      else:
-        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter, 0, CS.cruise_buttons))
-        
+
       brakePrep = CC.hudControl.leadVisible
       if self.CP.carFingerprint not in RAM_CARS: #placeholder for oplong enabled
         if self.CP.carFingerprint not in PAC_HYBRID:
@@ -261,7 +257,11 @@ class CarController:
                               0,1))
           can_sends.append(create_acc_1_message(self.packer, 0, self.frame / 2))
           can_sends.append(create_acc_1_message(self.packer, 2, self.frame / 2))
+      if self.accel_req == 1 and CS.accBrakePressed: #haven't gotten this to work 
 
+        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter, 0, CS.cruise_buttons, resume=True))
+      else:
+        can_sends.append(create_cruise_buttons(self.packer, CS.button_counter, 0, CS.cruise_buttons))
           # if self.frame % 10 == 0:
           #   new_msg = create_lkas_heartbit(self.packer, 0, CS.lkasHeartbit)
           #   can_sends.append(new_msg)
