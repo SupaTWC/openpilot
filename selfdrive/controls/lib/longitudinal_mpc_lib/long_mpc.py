@@ -53,9 +53,9 @@ FCW_IDXS = T_IDXS < 5.0
 T_DIFFS = np.diff(T_IDXS, prepend=[0.])
 MIN_ACCEL = -3.5
 MAX_ACCEL = 2.0
-T_FOLLOW = 1.22 #1.31
+T_FOLLOW = 1.12 #1.31
 COMFORT_BRAKE = 2.5
-STOP_DISTANCE = 6
+STOP_DISTANCE = 8
 
 def get_stopped_equivalence_factor(v_lead):
   return (v_lead**2) / (2 * COMFORT_BRAKE)
