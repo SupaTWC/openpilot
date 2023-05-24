@@ -191,10 +191,12 @@ class CarController:
                   if CS.out.vEgo > CC.hudControl.setSpeed -5 and self.torque > 0: 
                     self.torque *=0.5
                   elif CS.out.vEgo > 16 and self.torque > 0:
-                    self.torque *= 0.4  
+                    self.torque *= 0.3  
                   elif CS.out.vEgo > 9 and self.torque > 0:
-                    self.torque *= 0.4
-                  else: self.torque *= 3
+                    self.torque *= 0.5
+                  elif CS.out.vEgo > 1.5 and self.torque > 0:
+                    self.torque *= 3
+                  else: self.torque *= 2.5
                 else: self.torque = -1
               else: self.torque = -2
             
